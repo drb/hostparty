@@ -1,0 +1,8 @@
+# just a test hostsfile with lots of types of hostname that will be normalised
+8.8.8.8         dns.google.com dns.google.de
+10.5.6.7        foo.net blah.com
+45.6.7.8        dave.net xyz.com 123.org abcdefg.io boo-goose.co.uk
+8.8.4.4         xx.google.x dns-4-4.google.com x.dns.google.de
+1.2.3.4         one-two-three-four.count CAPS.lol
+1.2.3.5         repeated-host.net 2nd-one-two-three.count
+9.8.7.6         CAPITAL.XO XO.CAPITAL lower-case.net
