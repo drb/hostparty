@@ -9,6 +9,7 @@
         chai        = require('chai'),
         things      = require('chai-things'),
         hostparty   = require('../lib/party'),
+        hooks       = require('./tests-setup'),
         expect      = chai.expect;
 
     chai.use(things);
@@ -18,12 +19,14 @@
      *
      * @return {[type]}   [description]
      */
-    describe('hostsfile operations:', function() {
+    describe('Hosts file CRUD operations:', function() {
 
-
-        const testValues = {
-
-        };
+        /**
+         * sets options
+         */
+        hostparty.setup({
+            path: './tests/etc/hosts.test'
+        });
 
         /**
          * log types
@@ -35,8 +38,6 @@
             hostparty
                 .list()
                 .then(function(hosts) {
-                    // console.log("first test");
-                    // console.log(hosts);
                     expect(hosts).to.be.an('object');
                     done();
                 })
@@ -57,6 +58,40 @@
                     done();
                 })
                 .catch(done);
+        });
+
+
+        /**
+         * log types
+         *
+         * get types of log that are filterable
+         */
+        it('Add a new entry for IPv6 2001:0db8:85a3:0000:0000:8a2e:0370:7334 with 2 host names.', function (done) {
+
+            hostparty
+                .add('2001:0db8:85a3:0000:0000:8a2e:0370:7334', ['ipv6.test.com'])
+                .then(function() {
+                    done();
+                })
+                .catch(done);
+        });
+
+
+        /**
+         * log types
+         *
+         * get types of log that are filterable
+         */
+        it('Add bad IP and fail.', function (done) {
+
+            hostparty
+                .add('x1.2.d3.a4', ['irrelevant.com'])
+                .then(function() {
+                    done(new Error('Failed to trap error'));
+                })
+                .catch(function(){
+                    done();
+                });
         });
 
 

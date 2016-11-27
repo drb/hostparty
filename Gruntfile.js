@@ -31,7 +31,7 @@
 
                 // watch js files for changes
                 scripts: {
-                    files: ['*.js', 'lib/**/*.js', 'routes/**/*.js', 'tests/**/*.js', 'tests/etc/hosts.test'],
+                    files: ['*.js', 'lib/**/*.js', 'routes/**/*.js', 'tests/**/*.js', 'tests/etc/hosts.test.orig'],
                     tasks: ['jshint', 'simplemocha']
                 }
             },
@@ -60,15 +60,8 @@
 
         // mocha
         grunt.loadNpmTasks('grunt-simple-mocha');
-
-        // jshint
         grunt.loadNpmTasks('grunt-contrib-jshint');
-
-        // watch plugin
         grunt.loadNpmTasks('grunt-contrib-watch');
-
-        // unit tests
-        // grunt.registerTask('default', ['simplemocha', 'jshint']);
 
         // dev will start a watcher
         grunt.registerTask('dev', [

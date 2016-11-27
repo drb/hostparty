@@ -6,3 +6,4 @@
 1.2.3.4         one-two-three-four.count CAPS.lol
 1.2.3.5         repeated-host.net 2nd-one-two-three.count
 9.8.7.6         CAPITAL.XO XO.CAPITAL lower-case.net
+::1             localhost.ipv6

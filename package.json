@@ -1,25 +1,25 @@
 {
   "name": "hostparty",
   "version": "1.0.0",
-  "description": "Programmatic and CLI editing for OS hostsfile",
+  "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
     "test": "grunt test"
   },
   "repository": "https://github.com/drb/hostparty",
   "keywords": [
+    "hosts file",
     "hostfile",
-    "hostsfile",
     "/etc/hosts",
-    "host",
-    "file",
-    "local dns"
+    "local DNS management",
+    "CLI DNS"
   ],
   "author": "Dave Bullough <dave.bullough@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.6",
     "commander": "^2.9.0",
+    "is-ip": "^1.0.0",
     "lodash": "^4.16.6"
   },
   "devDependencies": {
