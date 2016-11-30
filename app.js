@@ -31,79 +31,69 @@ hostparty hosts - lists all hosts
 (function () {
 
     var pkg         = require('./package.json'),
+        party       = require('./lib/party'),
+        _           = require('lodash'),
+        util        = require('util'),
         program     = require('commander'),
-        promise     = require('bluebird'),
         isCLI       = !module.parent;
 
+    // test to check if the app is being invoked in cli mode, or as a library
     if (isCLI) {
 
-        var cmdValue, cmdParams;
+        /**
+         * pull the version out
+         */
+        program.version(pkg.version);
 
-        // program
-        //     .version(pkg.version)
-        //     .arguments('<cmd> [params...]')
-        //     .option('--path <path>', 'Path to file if not using auto discovery.')
-        //     .option('--test <test>', 'Outputs the resultant file to stdout without writing it.')
-        //     .action(function (cmd, params) {
-        //         cmdValue = cmd;
-        //         cmdParams = params;
-        //  });
+        /**
+         * list
+         *
+         * spits out the hosts file
+         */
+        program
+            .command('list [hostname]')
+            .description('Outputs the hosts file with matching hostname')
+            .action(function(hostname) {
 
-        // program.parse(process.argv);
-        //
-        // program
-        //   .command('foo <ip> [hosts...]')
-        //   .option('-p, --path', 'enable some path')
-        //   .description('execute the given remote cmd')
-        //   .action(function (ip, hosts) {
-        //     console.log('foo in action: ip: %s. hosts: %s', ip, hosts);
-        //   });
+                // gets the hosts file entries as a json blob
+                party
+                    .list(hostname)
+                    .then(function(hosts) {
+                        _.each(hosts, function(hosts, ip) {
+                            // console.log(ip);
+                            console.log(util.format('%s\t\t%s', ip, hosts.join(' ')));
+                        });
+                    })
+                    .then(function(){
+                        process.exit(0);
+                    })
+                    .catch(function(){
+                        process.exit(-1);
+                    });
+            });
 
+        /**
+         * setup
+         */
         program
             .command('setup [env...]')
             .description('run setup commands for all envs')
-            .option("-s, --setup_mode [mode]", "Which setup mode to use")
-            .option("-t, --test [test]", "Which test value to use")
+            .option("-s, --setup_mode       [mode]", "Which setup mode to use")
+            .option("-t, --test             [test]", "Which test value to use")
             .action(function(env, options){
                 var mode = options.setup_mode || "normal";
+                var test = options.test || "no test";
                 env = env || 'all';
-                console.log('setup for %s env(s) with %s mode', env, mode);
+                console.log('setup for %s env(s) with "%s" mode, and hosts path="%s".', env, mode, test);
             });
 
+        // parse argv
         program.parse(process.argv);
 
-        // console.log('command:', cmdValue);
-        // console.log('cmdParams: ', cmdParams || "no environment given");
-        // console.log('options: ', program.path, program.test);
     } else {
+
+        // just expose the api directly
         module.exports = party;
     }
 
-
-
-
-    // var windir = process.env.windir || process.env.WINDIR;
-    //   if (typeof windir === 'string' && windir.length > 0) {
-    //     file = windir + '\\SysWOW64\\cmd.exe';
-    //   }
-
-    // fs  .readFileAsync('/etc/hosts')
-    //     .then(function(file) {
-    //
-    //         var hosts = {};
-    //
-    //         file.toString().split("\n").map(function(line) {
-    //
-    //             if (line.indexOf('#') === 0) {
-    //                 return;
-    //             }
-    //
-    //             line = line .replace(/(\s)+/g, ' ')
-    //                         .split(' ');
-    //
-    //             console.log("ip % hostname %s", line[0], line[1], line);
-    //         });
-    //     });
-
-    // console.log(os.arch(), fileMaps.test);
 })();
