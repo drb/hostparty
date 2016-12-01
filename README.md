@@ -8,6 +8,10 @@
 
 ## Programmatic and CLI editor for hosts file; Nodejs.
 
+![NPM Stats](https://nodei.co/npm/hostparty.png?downloads=true&downloadRank=true&stars=true)
+
+[![Build Status](https://travis-ci.org/drb/hostparty.svg)](https://travis-ci.org/drb/hostparty) [![npm version](https://badge.fury.io/js/hostparty.svg)](http://badge.fury.io/js/hostparty)
+
 ### Installing:
 
 To use as a CLI tool, you can install hostparty globally.

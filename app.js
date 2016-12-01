@@ -10,16 +10,6 @@
  *
  * 1.0.1        23rd Nov 2016       Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
 
-Operating System	Version(s)	Location
-Unix, Unix-like, POSIX		/etc/hosts[3]
-Microsoft Windows	3.1	%WinDir%\HOSTS
-95, 98, ME	%WinDir%\hosts[4]
-NT, 2000, XP,[5] 2003, Vista,
-2008, 7, 2012, 8, 10	%SystemRoot%\System32\drivers\etc\hosts [6]
-Windows Mobile, Windows Phone		Registry key under HKEY_LOCAL_MACHINE\Comm\Tcpip\Hosts
-Apple Macintosh	9 and earlier	Preferences or System folder
-Mac OS X 10.0–10.1.5[7]	(Added through NetInfo or niload)
-Mac OS X 10.2 and newer	/etc/hosts (a symbolic link to /private/etc/hosts)[7]
 
 
 path = auto detect or, --path=/etc/hosts-test
