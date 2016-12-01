@@ -20,7 +20,8 @@
     "bluebird": "^3.4.6",
     "commander": "^2.9.0",
     "is-ip": "^1.0.0",
-    "lodash": "^4.16.6"
+    "lodash": "^4.16.6",
+    "text-table": "^0.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

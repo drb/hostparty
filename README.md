@@ -6,9 +6,9 @@
                (_/              (_/
 ```
 
-## Programmatic and CLI editor for hosts files.
+## Programmatic and CLI editor for hosts file; Nodejs.
 
-### Installing
+### Installing:
 
 To use as a CLI tool, you can install hostparty globally.
 
@@ -23,7 +23,7 @@ Or as an API in your own apps to `require()`.
 ```javascript
 let party = require('hostparty');
 
-// add a couple of hosts mapping to localhost
+// add a couple of hosts mapping to ip 127.0.0.1
 party.add('127.0.0.1', ['party-started.com', 'party-pooper.com']);
 
 // see who we have in our hosts file
@@ -36,7 +36,7 @@ party.list().then(function(hosts) {
 // remove the party pooper
 party.purge('party-pooper.com');
 
-// remove all entries pointing to localhost
+// remove all entries pointing to ip 127.0.0.1
 party.remove('127.0.0.1');
 
 ```
@@ -47,4 +47,8 @@ party.remove('127.0.0.1');
 sudo hostparty add 127.0.0.1 party-started.com
 ```
 
-Docs coming! 🎉
+### Notes:
+
+`::1` is protected from calls to `remove()` as this is a loopback address used by some operating systems during bootup. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected.
+
+More docs coming! 🎉

@@ -1,9 +1,15 @@
 /**
- * [fileMaps description]
  *
- * @type {Object}
+ *     /)
+ *    (/   ___ _  _/___   _   __ _/_
+ *    / )_(_) /_)_(__/_)_(_(_/ (_(__(_/_
+ *                .-/              .-/
+ *               (_/              (_/
  *
+ * CHANGELOG
  *
+ * 1.0.1        23rd Nov 2016       Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
+
 Operating System	Version(s)	Location
 Unix, Unix-like, POSIX		/etc/hosts[3]
 Microsoft Windows	3.1	%WinDir%\HOSTS
@@ -27,7 +33,8 @@ hostparty remove 10.44.55.66 - remove ip
 hostparty purge foo.net - remove host<s>
 hostparty list <hostname> - list file, or matching entries
 hostparty hosts - lists all hosts
- */
+ **/
+
 (function () {
 
     var pkg         = require('./package.json'),
@@ -35,34 +42,50 @@ hostparty hosts - lists all hosts
         _           = require('lodash'),
         util        = require('util'),
         program     = require('commander'),
+        table       = require('text-table'),
         isCLI       = !module.parent;
 
     // test to check if the app is being invoked in cli mode, or as a library
     if (isCLI) {
 
+        var options = {
+            path:           '-p, --path [path]',
+            description:    'Path to the host file (mutes auto detection)'
+        };
+
         /**
-         * pull the version out
+         * pull the version out for calls to --version
          */
         program.version(pkg.version);
 
         /**
          * list
          *
-         * spits out the hosts file
+         * spits out the hosts file in tabular format
          */
         program
             .command('list [hostname]')
-            .description('Outputs the hosts file with matching hostname')
+            .option(options.path, options.description)
+            .description('Outputs the hosts file with optional matching hostname')
             .action(function(hostname) {
 
                 // gets the hosts file entries as a json blob
                 party
                     .list(hostname)
                     .then(function(hosts) {
+
+                        var o = [],
+                            t;
+
+                        // push data into array
                         _.each(hosts, function(hosts, ip) {
-                            // console.log(ip);
-                            console.log(util.format('%s\t\t%s', ip, hosts.join(' ')));
+                            o.push([ip].concat(hosts));
                         });
+
+                        // delimit via pipe
+                        t = table(o, {hsep: ' | '});
+
+                        process.stdout.write(util.format(t, "\n"));
                     })
                     .then(function(){
                         process.exit(0);
@@ -72,19 +95,54 @@ hostparty hosts - lists all hosts
                     });
             });
 
+
         /**
-         * setup
+         * remove
          */
         program
-            .command('setup [env...]')
-            .description('run setup commands for all envs')
-            .option("-s, --setup_mode       [mode]", "Which setup mode to use")
-            .option("-t, --test             [test]", "Which test value to use")
-            .action(function(env, options){
-                var mode = options.setup_mode || "normal";
-                var test = options.test || "no test";
-                env = env || 'all';
-                console.log('setup for %s env(s) with "%s" mode, and hosts path="%s".', env, mode, test);
+            .command('remove [ips]')
+            .option(options.path, options.description)
+            .description('Removes all entries for an IP address')
+            .action(function(ip) {
+
+                // removes the ip
+                party
+                    .remove(ip)
+                    .then(function() {
+                        process.stdout.write(util.format("%s removed from file%s", ip, "\n"));
+                    })
+                    .then(function() {
+                        process.exit(0);
+                    })
+                    .catch(function (e) {
+                        process.stdout.write(util.format("%s%s", e, "\n"));
+                        process.exit(-1);
+                    });
+            });
+
+
+        /**
+         * purge
+         */
+        program
+            .command('purge [hosts]')
+            .option(options.path, options.description)
+            .description('Removes all host(s) specified')
+            .action(function(hostname) {
+
+                // removes the hostname(s) specified
+                party
+                    .purge(hostname)
+                    .then(function() {
+                        process.stdout.write(util.format("%s removed from file%s", hostname, "\n"));
+                    })
+                    .then(function() {
+                        process.exit(0);
+                    })
+                    .catch(function(e) {
+                        process.stdout.write(util.format("%s%s", e, "\n"));
+                        process.exit(-1);
+                    });
             });
 
         // parse argv
