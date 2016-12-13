@@ -73,7 +73,9 @@
                 .then(function() {
                     done();
                 })
-                .catch(done);
+                .catch(function(e) {
+                    done(e);
+                });
         });
 
 
@@ -123,7 +125,9 @@
                 .then(function() {
                     done();
                 })
-                .catch(done);
+                .catch(function(e) {
+                    done(new Error(e));
+                });
         });
     });
 }());

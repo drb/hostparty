@@ -45,10 +45,27 @@ party.remove('127.0.0.1');
 
 ```
 
-### CLI :
+### CLI Usage:
+
+From hostparty --help:
 
 ```
-sudo hostparty add 127.0.0.1 party-started.com
+
+  Usage: hostparty [options] [command]
+
+
+  Commands:
+
+    list [options] [hostname]  Outputs the hosts file with optional matching hostname
+    remove [options] [ips]     Removes all entries for an IP address
+    purge [options] [hosts]    Removes all host(s) specified
+
+  Options:
+
+    -h, --help     output usage information
+    -V, --version  output the version number
+
+
 ```
 
 ### Notes:

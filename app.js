@@ -39,8 +39,14 @@ hostparty hosts - lists all hosts
     if (isCLI) {
 
         var options = {
-            path:           '-p, --path [path]',
-            description:    'Path to the host file (mutes auto detection)'
+            path: {
+                flag:           '-p, --path [path]',
+                description:    'Path to the host file (mutes auto detection)'
+            },
+            force: {
+                flag:           '-f, --force',
+                description:    'Ovverrides the validation. Use with caution.'
+            }
         };
 
         /**
@@ -55,7 +61,7 @@ hostparty hosts - lists all hosts
          */
         program
             .command('list [hostname]')
-            .option(options.path, options.description)
+            .option(options.path.flag, options.path.description)
             .description('Outputs the hosts file with optional matching hostname')
             .action(function(hostname) {
 
@@ -91,7 +97,8 @@ hostparty hosts - lists all hosts
          */
         program
             .command('remove [ips]')
-            .option(options.path, options.description)
+            .option(options.path.flag, options.path.description)
+            .option(options.force.flag, options.force.description)
             .description('Removes all entries for an IP address')
             .action(function(ip) {
 
@@ -116,7 +123,7 @@ hostparty hosts - lists all hosts
          */
         program
             .command('purge [hosts]')
-            .option(options.path, options.description)
+            .option(options.path.flag, options.path.description)
             .description('Removes all host(s) specified')
             .action(function(hostname) {
 
@@ -125,6 +132,31 @@ hostparty hosts - lists all hosts
                     .purge(hostname)
                     .then(function() {
                         process.stdout.write(util.format("%s removed from file%s", hostname, "\n"));
+                    })
+                    .then(function() {
+                        process.exit(0);
+                    })
+                    .catch(function(e) {
+                        process.stdout.write(util.format("%s%s", e, "\n"));
+                        process.exit(-1);
+                    });
+            });
+
+
+        /**
+         * disable
+         */
+        program
+            .command('disable [ips]')
+            .option(options.path.flag, options.path.description)
+            .description('Disables an IP entry')
+            .action(function(ips) {
+
+                // removes the ip(s) specified
+                party
+                    .disable(ips)
+                    .then(function() {
+                        process.stdout.write(util.format("%s disabled in host file%s", ips, "\n"));
                     })
                     .then(function() {
                         process.exit(0);
