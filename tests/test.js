@@ -14,6 +14,8 @@
 
     chai.use(things);
 
+    console.log(hooks);
+
     /**
      * Customers tests
      *
@@ -25,7 +27,9 @@
          * sets options
          */
         hostparty.setup({
-            path: './tests/etc/hosts.test'
+
+            // set the path manually. overrides the host mapping.
+            path: hooks.path//'./tests/etc/hosts.test'
         });
 
         /**
@@ -122,6 +126,42 @@
 
             hostparty
                 .remove('8.8.4.4')
+                .then(function() {
+                    done();
+                })
+                .catch(function(e) {
+                    done(new Error(e));
+                });
+        });
+
+
+        /**
+         * remove protected
+         *
+         * tries to delete a known protected ip. expected to fail.
+         */
+        it('Attempt to remove a protected IP address [::1] and be rejected.', function (done) {
+
+            hostparty
+                .remove('::1')
+                .then(function() {
+                    done(new Error('Failed to trap error'));
+                })
+                .catch(function(){
+                    done();
+                });
+        });
+
+
+        /**
+         * remove protected
+         *
+         * tries to delete a known protected ip. expected to fail.
+         */
+        it('Attempt to disable an IP address [1.2.3.4] and be rejected.', function (done) {
+
+            hostparty
+                .disable('10.20.30.40')
                 .then(function() {
                     done();
                 })

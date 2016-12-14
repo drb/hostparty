@@ -8,35 +8,54 @@
 
     'use strict';
 
-    var request = require('supertest'),
-        expect  = require('chai').expect;
+    var fs      = require('fs'),
+        path    = require('path'),
+        util    = require('util'),
+        request = require('supertest'),
+        expect  = require('chai').expect,
+        config  = {
+            // source data
+            orig: path.resolve('./tests/etc/hosts.test.orig'),
+            // path to temp file
+            path: path.resolve(util.format('./tests/etc/hosts.%s.tmp', Math.floor(Math.random() * 100000)))
+        };
 
+    // executed before any tests
+    before(function() {
 
-    describe('hooks', function() {
+        // copy source file
+        fs.writeFileSync(config.path, fs.readFileSync(config.orig));
 
-        // executed before any tests
-        before(function(done) {
-            done();
-        });
-
-
-        // executed before each test
-        beforeEach(function(done) {
-            done();
-        });
-
-        // executed after each test
-        afterEach(function(done) {
-            done();
-        });
-
-        // executed after all tests
-        after(function(done) {
-            //
+        // pre-api call
+        it('Should load the test data from a souce file and copy into a temp directory.', function (done) {
             done();
         });
     });
 
-    module.exports = {};
+
+    // executed before each test
+    beforeEach(function(done) {
+        done();
+    });
+
+    // executed after each test
+    afterEach(function(done) {
+        done();
+    });
+
+    // executed after all tests
+    after(function(done) {
+
+        // remove the file
+        // fs.unlinkSync(config.tmp);
+
+        // reset config
+        config = {};
+
+        //
+        done();
+    });
+
+    module.exports = config;
 
 }());

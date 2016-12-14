@@ -8,7 +8,8 @@
  *
  * CHANGELOG
  *
- * 1.0.1        23rd Nov 2016       Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
+ * 1.0.1 / 23rd Nov 2016 / Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
+ * 1.0.2 / 14 Dec 2016 / More shit
 
 
 
@@ -33,19 +34,21 @@ hostparty hosts - lists all hosts
         util        = require('util'),
         program     = require('commander'),
         table       = require('text-table'),
+
+        // test to check if the app is being invoked in cli mode, or as a library
         isCLI       = !module.parent;
 
-    // test to check if the app is being invoked in cli mode, or as a library
+    // app was invoked by the CLI, so map the args
     if (isCLI) {
 
         var options = {
             path: {
                 flag:           '-p, --path [path]',
-                description:    'Path to the host file (mutes auto detection)'
+                description:    'Path to the host file (mutes auto-detection)'
             },
             force: {
                 flag:           '-f, --force',
-                description:    'Ovverrides the validation. Use with caution.'
+                description:    'Overrides checks & forces changes. Use with caution.'
             }
         };
 

@@ -31,7 +31,7 @@
 
                 // watch js files for changes
                 scripts: {
-                    files: ['*.js', 'lib/**/*.js', 'routes/**/*.js', 'tests/**/*.js', 'tests/etc/hosts.test.orig'],
+                    files: ['*.js', 'lib/*.js', 'routes/**/*.js', 'tests/**/*.js', 'tests/etc/hosts.test.orig'],
                     tasks: ['jshint', 'simplemocha']
                 }
             },
