@@ -128,7 +128,7 @@ hostparty hosts - lists all hosts
                     })
                     .add(ip, hosts)
                     .then(function() {
-                        process.stdout.write(util.format("%s sdded to file%s", ip, "\n"));
+                        process.stdout.write(util.format("%s added to file%s", ip, "\n"));
                     })
                     .then(function() {
                         process.exit(0);
@@ -159,7 +159,7 @@ hostparty hosts - lists all hosts
                     })
                     .remove(ip)
                     .then(function() {
-                        process.stdout.write(util.format("%s removed from file%s", ip, "\n"));
+                        process.stdout.write(util.format("%s removed from file%s", ip.join(', '), "\n"));
                     })
                     .then(function() {
                         process.exit(0);
@@ -189,7 +189,7 @@ hostparty hosts - lists all hosts
                     })
                     .purge(hostname)
                     .then(function() {
-                        process.stdout.write(util.format("%s removed from file%s", hostname, "\n"));
+                        process.stdout.write(util.format("%s removed from file%s", hostname.join(', '), "\n"));
                     })
                     .then(function() {
                         process.exit(0);
@@ -219,7 +219,7 @@ hostparty hosts - lists all hosts
                     })
                     .disable(ips)
                     .then(function() {
-                        process.stdout.write(util.format("%s disabled in host file%s", ips, "\n"));
+                        process.stdout.write(util.format("%s disabled in host file%s", ips.join(', '), "\n"));
                     })
                     .then(function() {
                         process.exit(0);
@@ -248,7 +248,7 @@ hostparty hosts - lists all hosts
                     })
                     .enable(ips)
                     .then(function() {
-                        process.stdout.write(util.format("%s enabled in host file%s", ips, "\n"));
+                        process.stdout.write(util.format("%s enabled in host file%s", ips.join(', '), "\n"));
                     })
                     .then(function() {
                         process.exit(0);

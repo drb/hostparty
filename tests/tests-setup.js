@@ -47,7 +47,7 @@
     after(function(done) {
 
         // remove the file
-        // fs.unlinkSync(config.tmp);
+        fs.unlinkSync(config.tmp);
 
         // reset config
         config = {};
