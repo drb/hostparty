@@ -14,8 +14,6 @@
 
     chai.use(things);
 
-    console.log(hooks);
-
     /**
      * Customers tests
      *
@@ -29,7 +27,7 @@
         hostparty.setup({
 
             // set the path manually. overrides the host mapping.
-            path: hooks.path//'./tests/etc/hosts.test'
+            path: hooks.path
         });
 
         /**
@@ -158,7 +156,7 @@
          *
          * tries to delete a known protected ip. expected to fail.
          */
-        it('Attempt to disable an IP address [1.2.3.4] and be rejected.', function (done) {
+        it('Attempt to disable an IP address [10.20.30.40].', function (done) {
 
             hostparty
                 .disable('10.20.30.40')
