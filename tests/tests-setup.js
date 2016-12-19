@@ -46,8 +46,10 @@
     // executed after all tests
     after(function(done) {
 
-        // remove the file
-        fs.unlinkSync(config.tmp);
+        try {
+            // remove the file
+            fs.unlinkSync(config.tmp);
+        } catch (e) {}
 
         // reset config
         config = {};

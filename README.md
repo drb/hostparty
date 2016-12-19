@@ -50,26 +50,26 @@ party.remove('127.0.0.1');
 From hostparty --help:
 
 ```
-
   Usage: hostparty [options] [command]
 
 
   Commands:
 
-    list [options] [hostname]  Outputs the hosts file with optional matching hostname
-    remove [options] [ips]     Removes all entries for an IP address
-    purge [options] [hosts]    Removes all host(s) specified
+    list [options] [hostname]      Outputs the hosts file with optional matching hostname.
+    add [options] [ip] [hosts...]  Adds a new host(s) entry for an IP address.
+    remove [options] [ips...]      Removes all entries for an IP address.
+    purge [options] [hosts...]     Removes all host(s) specified.
+    disable [options] [ips...]     Disables (multiple) IP entries.
+    enable [options] [ips...]      Enables previously disabled (multiple) IP entries.
 
   Options:
 
     -h, --help     output usage information
     -V, --version  output the version number
-
-
 ```
 
 ### Notes:
 
-`::1` is protected from calls to `remove()` as this is a loopback address used by some operating systems during bootup. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected.
+Some entries such as `::1` on OSX is protected from calls to `remove()` as this is a loopback address used by the operating system during bootup. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected unless the `--force` flag is used.
 
 More docs coming! 🎉

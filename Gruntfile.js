@@ -65,6 +65,7 @@
 
         // dev will start a watcher
         grunt.registerTask('dev', [
+            'test',
             'watch'
         ]);
 
