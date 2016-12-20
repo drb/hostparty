@@ -124,13 +124,23 @@
          */
         it('Add bad IP and fail.', function (done) {
 
+            let badIp = 'x1.2.d3.a4';
+
             hostparty
-                .add('x1.2.d3.a4', ['irrelevant.com'])
+                .add(badIp, ['irrelevant.com'])
                 .then(function() {
                     done(new Error('Failed to trap error'));
                 })
-                .catch(function(){
-                    done();
+                .catch(function() {
+
+                    hostparty
+                        .list()
+                        .then(function(hosts) {
+                            expect(hosts).to.be.an('object');
+                            expect(hosts).to.not.have.property(badIp);
+                            done();
+                        })
+                        .catch(done);
                 });
         });
 
@@ -140,9 +150,9 @@
          *
          * get types of log that are filterable
          */
-        it('Removes a host name [dogs.woof].', function (done) {
+        it('Removes a host name [foo.net].', function (done) {
 
-            let removedHost = 'dogs.woof';
+            let removedHost = 'foo.net';
 
             hostparty
                 .purge(removedHost)
@@ -152,7 +162,7 @@
                         .list()
                         .then(function(hosts) {
                             expect(hosts).to.be.an('object');
-                            // expect(hosts).to.not.have.property(ip);
+                            expect(hosts['10.5.6.7']).to.not.include(removedHost);
                             done();
                         })
                         .catch(done);

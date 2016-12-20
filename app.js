@@ -62,8 +62,6 @@ hostparty hosts - lists all hosts
          */
         program.version(pkg.version);
 
-
-
         /**
          * list
          *
@@ -229,6 +227,7 @@ hostparty hosts - lists all hosts
                         process.exit(-1);
                     });
             });
+
 
         /**
          * enable an entry that was previously disabled

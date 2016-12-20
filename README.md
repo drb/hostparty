@@ -40,8 +40,8 @@ party.list().then(function(hosts) {
 // remove the party pooper
 party.purge('party-pooper.com');
 
-// remove all entries pointing to ip 127.0.0.1
-party.remove('127.0.0.1');
+// remove all entries pointing to ip 127.0.0.1 and 8.8.4.4
+party.remove(['127.0.0.1', '8.8.4.4']);
 
 ```
 
