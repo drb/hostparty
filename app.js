@@ -51,7 +51,7 @@ hostparty hosts - lists all hosts
                 flag:           '-f, --force',
                 description:    'Overrides checks & forces changes. Use with caution.'
             },
-            noGroup: {
+            group: {
                 flag:           '-ng, --no-group',
                 description:    'One line per hostname, instead of grouping.'
             }
@@ -70,7 +70,7 @@ hostparty hosts - lists all hosts
         program
             .command('list [hostname]')
             .option(options.path.flag, options.path.description)
-            .option(options.noGroup.flag, options.noGroup.description)
+            .option(options.group.flag, options.group.description)
             .description('Outputs the hosts file with optional matching hostname.')
             .action(function(hostname, options) {
 
@@ -79,7 +79,7 @@ hostparty hosts - lists all hosts
                     .setup({
                         path:   options.path,
                         force:  options.force,
-                        group:  !options.noGroup
+                        group:  !options.group
                     })
                     .list(hostname)
                     .then(function(hosts) {
@@ -89,7 +89,16 @@ hostparty hosts - lists all hosts
 
                         // push data into array
                         _.each(hosts, function(hosts, ip) {
-                            o.push([ip].concat(hosts));
+                            if (options.group) {
+
+                                o.push([ip].concat(hosts));
+                            } else {
+
+                                // don't group - 1 line per IP
+                                hosts.forEach(function(host) {
+                                    o.push([ip, host]);
+                                });
+                            }
                         });
 
                         // delimit via pipe

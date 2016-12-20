@@ -59,13 +59,14 @@ From hostparty --help:
     add [options] [ip] [hosts...]  Adds a new host(s) entry for an IP address.
     remove [options] [ips...]      Removes all entries for an IP address.
     purge [options] [hosts...]     Removes all host(s) specified.
-    disable [options] [ips...]     Disables (multiple) IP entries.
-    enable [options] [ips...]      Enables previously disabled (multiple) IP entries.
 
   Options:
 
-    -h, --help     output usage information
-    -V, --version  output the version number
+    -p, --path          Path to file (auto-detection is enabled by default)
+    -f, --force         Disable any validation on protected methods
+    -ng, --no-group     Don't group by IP
+    -h, --help          Output usage information
+    -V, --version       Output the version number
 ```
 
 ### Notes:

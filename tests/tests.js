@@ -222,27 +222,27 @@
          *
          * tries to delete a known protected ip. expected to fail.
          */
-        it('Attempt to disable an IP address [10.20.30.40].', function (done) {
-
-            let disabledIP = '10.20.30.40';
-
-            hostparty
-                .disable(disabledIP)
-                .then(function() {
-
-                    hostparty
-                        .list()
-                        .then(function(hosts) {
-                            expect(hosts).to.be.an('object');
-                            expect(hosts).to.not.have.property(disabledIP);
-                            done();
-                        })
-                        .catch(done);
-                })
-                .catch(function(e) {
-                    done(new Error(e));
-                });
-        });
+        // it('Attempt to disable an IP address [10.20.30.40].', function (done) {
+        //
+        //     let disabledIP = '10.20.30.40';
+        //
+        //     hostparty
+        //         .disable(disabledIP)
+        //         .then(function() {
+        //
+        //             hostparty
+        //                 .list()
+        //                 .then(function(hosts) {
+        //                     expect(hosts).to.be.an('object');
+        //                     expect(hosts).to.not.have.property(disabledIP);
+        //                     done();
+        //                 })
+        //                 .catch(done);
+        //         })
+        //         .catch(function(e) {
+        //             done(new Error(e));
+        //         });
+        // });
 
 
         /**
