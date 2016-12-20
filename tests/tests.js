@@ -7,13 +7,10 @@
 
     var request     = require('supertest'),
         chai        = require('chai'),
-        // things      = require('chai-things'),
         hostparty   = require('../lib/party'),
         hooks       = require('./tests-setup'),
         expect      = chai.expect;
 
-    // chai.should();
-    // chai.use(things);
 
     /**
      * Customers tests
