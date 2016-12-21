@@ -1,6 +1,6 @@
 {
   "name": "hostparty",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
@@ -14,9 +14,6 @@
     "local DNS management",
     "CLI DNS"
   ],
-  "bin": {
-      "hostparty" : "./app.js"
-  },
   "author": "Dave Bullough <dave.bullough@gmail.com>",
   "license": "MIT",
   "dependencies": {
