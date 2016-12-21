@@ -1,6 +1,6 @@
 {
   "name": "hostparty",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
@@ -9,11 +9,14 @@
   "repository": "https://github.com/drb/hostparty",
   "keywords": [
     "hosts file",
-    "hostfile",
+    "hostsfile",
     "/etc/hosts",
     "local DNS management",
     "CLI DNS"
   ],
+  "bin": {
+      "hostparty" : "./app.js"
+  },
   "author": "Dave Bullough <dave.bullough@gmail.com>",
   "license": "MIT",
   "dependencies": {

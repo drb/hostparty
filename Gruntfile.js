@@ -69,7 +69,7 @@
             'watch'
         ]);
 
-        // dev will compile the RAML and start a watcher
+        // dev will start a watcher on changes to js files/test data and run tests and linter
         grunt.registerTask('test', 'simplemocha');
     };
 
