@@ -18,30 +18,61 @@ To use as a CLI tool, you can install hostparty globally.
 
 `npm install -g hostparty`
 
-Or as an API in your own apps to `require()`.
+Or, `require('hostparty')` in your own applications to use the API:
 
 `npm install hostparty --save`
 
 ### API:
 
+All API methods return thenable promises.
+
 ```javascript
 let party = require('hostparty');
+
 
 // add a couple of hosts mapping to ip 127.0.0.1
 party.add('127.0.0.1', ['party-started.com', 'party-pooper.com']);
 
+
 // see who we have in our hosts file
 party.list().then(function(hosts) {
 
-    // `hosts` is an object containing the ip as a key, and the value an array of hostnames
+    // `hosts` is an object containing the ip as a key, and the hostnames(s) bound as an array
     // 127.0.0.1 party-started.com party-pooper.com
 });
 
-// remove the party pooper
+
+// remove the party pooper from its bound ip
 party.purge('party-pooper.com');
 
-// remove all entries pointing to ip 127.0.0.1 and 8.8.4.4
+
+// remove all entries pointing to ips 127.0.0.1 and 8.8.4.4
 party.remove(['127.0.0.1', '8.8.4.4']);
+
+
+// try and remove a protected IP
+party
+    .remove('::1')
+    .then(function() {
+        console.log("All good");
+    })
+    .catch(function(e) {
+        console.error('Error found [%s]. Try using the force flag.', e.message);
+    });
+
+
+// set options to change the default path, and override any warnings
+party
+    .setup({
+        // override the path to the file
+        path:   '~/my-own/hosts',
+        // ignores validation
+        force:  true
+    })
+    .remove('::1')
+    .then(function() {
+        console.log("All good");
+    });
 
 ```
 
@@ -71,6 +102,6 @@ From hostparty --help:
 
 ### Notes:
 
-Some entries such as `::1` on OSX is protected from calls to `remove()` as this is a loopback address used by the operating system during bootup. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected unless the `--force` flag is used.
+Some entries such as `::1` on OSX is protected from calls to `remove()` as this is a loopback address used by the operating system during the boot cycle. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected unless the `--force` flag is used.
 
 More docs coming! 🎉

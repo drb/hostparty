@@ -9,21 +9,8 @@
  * CHANGELOG
  *
  * 1.0.1 / 23rd Nov 2016 / Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
- * 1.0.2 / 14 Dec 2016 / More shit
-
-
-
-path = auto detect or, --path=/etc/hosts-test
-repository, allow diffs
-show history
-validate dupes
-order by hosts
-
-hostparty add 10.44.55.66 foo.net balls test - add new row (or add entries to existing)
-hostparty remove 10.44.55.66 - remove ip
-hostparty purge foo.net - remove host<s>
-hostparty list <hostname> - list file, or matching entries
-hostparty hosts - lists all hosts
+ * 1.0.2 / 14 Dec 2016 / Release ready
+ * 1.0.4 / 22 Dec 2016 / Better tests
  **/
 
 (function () {
@@ -35,6 +22,8 @@ hostparty hosts - lists all hosts
         promise     = require('bluebird'),
         program     = require('commander'),
         table       = require('text-table'),
+        color       = require('cli-color'),
+        // ansiTrim    = require('cli-color/lib/trim'),
 
         // test to check if the app is being invoked in cli mode, or as a library
         isCLI       = !module.parent;
@@ -84,7 +73,11 @@ hostparty hosts - lists all hosts
                     .list(hostname)
                     .then(function(hosts) {
 
-                        var o = [],
+                        var opts = {
+                                hsep: ' | ',
+                                // stringLength: function(s) { return ansiTrim(s).length; }
+                            },
+                            o = [],
                             t;
 
                         // push data into array
@@ -102,7 +95,7 @@ hostparty hosts - lists all hosts
                         });
 
                         // delimit via pipe
-                        t = table(o, {hsep: ' | '});
+                        t = table(o, opts);
 
                         process.stdout.write(util.format(t, "\n"));
                     })
