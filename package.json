@@ -1,13 +1,13 @@
 {
   "name": "hostparty",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
     "test": "grunt test"
   },
   "bin": {
-    "hostparty": "./bin/cli.js"  
+    "hostparty": "./bin/cli.js"
   },
   "repository": "https://github.com/drb/hostparty",
   "keywords": [
