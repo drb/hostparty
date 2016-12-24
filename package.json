@@ -6,6 +6,9 @@
   "scripts": {
     "test": "grunt test"
   },
+  "bin": {
+    "hostparty": "./bin/cli.js"  
+  },
   "repository": "https://github.com/drb/hostparty",
   "keywords": [
     "hosts file",
