@@ -101,8 +101,6 @@
         .description('Removes all entries for an IP address.')
         .action(function(ip, hosts, options) {
 
-            // console.log(ip, hosts);
-
             // removes the ip
             party
                 .setup({
@@ -111,7 +109,7 @@
                 })
                 .add(ip, hosts)
                 .then(function() {
-                    process.stdout.write(util.format("%s added to file%s", ip, "\n"));
+                    process.stdout.write(util.format("%s hostname(s) added to IP %s%s", hosts.length, ip, "\n"));
                 })
                 .then(function() {
                     process.exit(0);
@@ -245,5 +243,10 @@
 
     // parse argv
     program.parse(process.argv);
+
+    // nothing supplied! show help
+    if (program.args.length === 0) {
+        program.help();
+    }
 
 })();

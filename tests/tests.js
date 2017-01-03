@@ -89,6 +89,63 @@
          *
          * get types of log that are filterable
          */
+        it('Remove hostname entry from 1.1.2.2.', function (done) {
+
+            let ip = '1.1.2.3',
+                host = 'cats.things';
+
+            hostparty
+                .purge(host)
+                .then(function() {
+
+                    hostparty
+                        .list()
+                        .then(function(hosts) {
+                            expect(hosts).to.be.an('object');
+                            expect(hosts).to.have.property(ip);
+                            expect(hosts[ip]).to.have.length(1);
+                            expect(hosts[ip]).to.have.deep.property('[0]', 'dogs.foo');
+                            done();
+                        })
+                        .catch(done);
+                })
+                .catch(done);
+        });
+
+
+
+        /**
+         * log types
+         *
+         * get types of log that are filterable
+         */
+        it('Remove another hostname entry from 1.1.2.2, removing the IP entirely', function (done) {
+
+            let ip = '1.1.2.3',
+                host = 'dogs.foo';
+
+            hostparty
+                .purge(host)
+                .then(function() {
+
+                    hostparty
+                        .list()
+                        .then(function(hosts) {
+                            expect(hosts).to.be.an('object');
+                            expect(hosts).to.not.have.property(ip);
+                            done();
+                        })
+                        .catch(done);
+                })
+                .catch(done);
+        });
+
+
+        /**
+         * log types
+         *
+         * get types of log that are filterable
+         */
         it('Add a new entry for IPv6 2001:0db8:85a3:0000:0000:8a2e:0370:7334 with 2 host names.', function (done) {
 
             let ipv6 = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
