@@ -185,61 +185,61 @@
     /**
      * disable an entry (comments it out)
      */
-    program
-        .command('disable [ips...]')
-        .option(options.path.flag, options.path.description)
-        .option(options.force.flag, options.force.description)
-        .description('Disables an IP entry.')
-        .action(function(ips, options) {
-
-            // removes the ip(s) specified
-            party
-                .setup({
-                    path:   options.path,
-                    force:  options.force
-                })
-                .disable(ips)
-                .then(function() {
-                    process.stdout.write(util.format("%s disabled in host file%s", ips.join(', '), "\n"));
-                })
-                .then(function() {
-                    process.exit(0);
-                })
-                .catch(function(e) {
-                    process.stdout.write(util.format("%s%s", e, "\n"));
-                    process.exit(-1);
-                });
-        });
-
-
-    /**
-     * enable an entry that was previously disabled
-     */
-    program
-        .command('enable [ips...]')
-        .option(options.path.flag, options.path.description)
-        .option(options.force.flag, options.force.description)
-        .description('Enables an IP entry.')
-        .action(function(ips, options) {
-
-            // removes the ip(s) specified
-            party
-                .setup({
-                    path:   options.path,
-                    force:  options.force
-                })
-                .enable(ips)
-                .then(function() {
-                    process.stdout.write(util.format("%s enabled in host file%s", ips.join(', '), "\n"));
-                })
-                .then(function() {
-                    process.exit(0);
-                })
-                .catch(function(e) {
-                    process.stdout.write(util.format("%s%s", e, "\n"));
-                    process.exit(-1);
-                });
-        });
+    // program
+    //     .command('disable [ips...]')
+    //     .option(options.path.flag, options.path.description)
+    //     .option(options.force.flag, options.force.description)
+    //     .description('Disables an IP entry.')
+    //     .action(function(ips, options) {
+    //
+    //         // removes the ip(s) specified
+    //         party
+    //             .setup({
+    //                 path:   options.path,
+    //                 force:  options.force
+    //             })
+    //             .disable(ips)
+    //             .then(function() {
+    //                 process.stdout.write(util.format("%s disabled in host file%s", ips.join(', '), "\n"));
+    //             })
+    //             .then(function() {
+    //                 process.exit(0);
+    //             })
+    //             .catch(function(e) {
+    //                 process.stdout.write(util.format("%s%s", e, "\n"));
+    //                 process.exit(-1);
+    //             });
+    //     });
+    //
+    //
+    // /**
+    //  * enable an entry that was previously disabled
+    //  */
+    // program
+    //     .command('enable [ips...]')
+    //     .option(options.path.flag, options.path.description)
+    //     .option(options.force.flag, options.force.description)
+    //     .description('Enables an IP entry.')
+    //     .action(function(ips, options) {
+    //
+    //         // removes the ip(s) specified
+    //         party
+    //             .setup({
+    //                 path:   options.path,
+    //                 force:  options.force
+    //             })
+    //             .enable(ips)
+    //             .then(function() {
+    //                 process.stdout.write(util.format("%s enabled in host file%s", ips.join(', '), "\n"));
+    //             })
+    //             .then(function() {
+    //                 process.exit(0);
+    //             })
+    //             .catch(function(e) {
+    //                 process.stdout.write(util.format("%s%s", e, "\n"));
+    //                 process.exit(-1);
+    //             });
+    //     });
 
     // parse argv
     program.parse(process.argv);
