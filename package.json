@@ -1,6 +1,6 @@
 {
   "name": "hostparty",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
@@ -9,7 +9,10 @@
   "bin": {
     "hostparty": "./bin/cli.js"
   },
-  "repository": "https://github.com/drb/hostparty",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drb/hostparty"
+  },
   "keywords": [
     "hosts file",
     "hostsfile",

@@ -27,7 +27,7 @@
         fs.writeFileSync(config.path, fs.readFileSync(config.orig));
 
         // pre-api call
-        it('Should load the test data from a souce file and copy into a temp directory.', function (done) {
+        it('Should load the test data from a known source file and copy into a temp directory to do operations on.', function (done) {
             done();
         });
     });
@@ -44,18 +44,20 @@
     });
 
     // executed after all tests
-    after(function(done) {
+    after(function() {
 
-        try {
-            // remove the file
-            fs.unlinkSync(config.tmp);
-        } catch (e) {}
-
-        // reset config
-        config = {};
-
-        //
-        done();
+        // remove the file
+        fs  .unlinkAsync(config.path)
+            .then(function() {
+                // console.log("Cleanup done");
+            })
+            .catch(function(e) {
+                // console.log("Cleanup failed", e);
+            })
+            .lastly(function() {
+                // reset config
+                config = {};
+            });
     });
 
     module.exports = config;

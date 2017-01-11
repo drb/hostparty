@@ -6,7 +6,7 @@
                (_/              (_/
 ```
 
-## Programmatic and CLI editor for hosts file; Nodejs.
+## Cross platform CLI editor & JavaScript API for managing hosts files.
 
 ![NPM Stats](https://nodei.co/npm/hostparty.png?downloads=true&downloadRank=true&stars=true)
 
