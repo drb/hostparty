@@ -35,7 +35,7 @@ party.add('127.0.0.1', ['party-started.com', 'party-pooper.com']);
 
 
 // see who we have in our hosts file
-party.list().then(function(hosts) {
+party.list().then((hosts)=>{
 
     // `hosts` is an object containing the ip as a key, and the hostnames(s) bound as an array
     // 127.0.0.1 party-started.com party-pooper.com
@@ -53,10 +53,10 @@ party.remove(['127.0.0.1', '8.8.4.4']);
 // try and remove a protected IP
 party
     .remove('::1')
-    .then(function() {
+    .then(()=>{
         console.log("All good");
     })
-    .catch(function(e) {
+    .catch((e)=>{
         console.error('Error found [%s]. Try using the force flag.', e.message);
     });
 
@@ -70,7 +70,7 @@ party
         force:  true
     })
     .remove('::1')
-    .then(function() {
+    .then(()=>{
         console.log("All good");
     });
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-(function () {
+(()=>{
 
     var pkg         = require('../package.json'),
         party       = require('../lib/party'),
@@ -44,7 +44,7 @@
         .option(options.path.flag, options.path.description)
         .option(options.group.flag, options.group.description)
         .description('Outputs the hosts file with optional matching hostname.')
-        .action(function(hostname, options) {
+        .action((hostname, options)=>{
 
             // gets the hosts file entries as a json blob
             party
@@ -54,7 +54,7 @@
                     group:  !options.group
                 })
                 .list(hostname)
-                .then(function(hosts) {
+                .then((hosts)=>{
 
                     var opts = {
                             hsep: ' | ',
@@ -64,14 +64,14 @@
                         t;
 
                     // push data into array
-                    _.each(hosts, function(hosts, ip) {
+                    _.each(hosts, (hosts, ip)=>{
                         if (options.group) {
 
                             o.push([ip].concat(hosts));
                         } else {
 
                             // don't group - 1 line per IP
-                            hosts.forEach(function(host) {
+                            hosts.forEach((host)=>{
                                 o.push([ip, host]);
                             });
                         }
@@ -82,10 +82,10 @@
 
                     process.stdout.write(util.format(t, "\n"));
                 })
-                .then(function(){
+                .then(()=>{
                     process.exit(0);
                 })
-                .catch(function(){
+                .catch(()=>{
                     process.exit(-1);
                 });
         });
@@ -99,7 +99,7 @@
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
         .description('Removes all entries for an IP address.')
-        .action(function(ip, hosts, options) {
+        .action((ip, hosts, options)=>{
 
             // removes the ip
             party
@@ -108,13 +108,13 @@
                     force:  options.force
                 })
                 .add(ip, hosts)
-                .then(function() {
+                .then(()=>{
                     process.stdout.write(util.format("%s hostname(s) added to IP %s%s", hosts.length, ip, "\n"));
                 })
-                .then(function() {
+                .then(()=>{
                     process.exit(0);
                 })
-                .catch(function (e) {
+                .catch((e)=>{
                     process.stdout.write(util.format("%s%s", e, "\n"));
                     process.exit(-1);
                 });
@@ -130,7 +130,7 @@
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
         .description('Removes all entries for an IP address.')
-        .action(function(ip, options) {
+        .action((ip, options)=>{
 
             // removes the ip
             party
@@ -139,13 +139,13 @@
                     force:  options.force
                 })
                 .remove(ip)
-                .then(function() {
+                .then(()=>{
                     process.stdout.write(util.format("%s removed from file%s", ip.join(', '), "\n"));
                 })
-                .then(function() {
+                .then(()=>{
                     process.exit(0);
                 })
-                .catch(function (e) {
+                .catch((e)=>{
                     process.stdout.write(util.format("%s%s", e, "\n"));
                     process.exit(-1);
                 });
@@ -160,7 +160,7 @@
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
         .description('Removes all host(s) specified.')
-        .action(function(hostname, options) {
+        .action((hostname, options)=>{
 
             // removes the hostname(s) specified
             party
@@ -169,13 +169,13 @@
                     force:  options.force
                 })
                 .purge(hostname)
-                .then(function() {
+                .then(()=>{
                     process.stdout.write(util.format("%s removed from file%s", hostname.join(', '), "\n"));
                 })
-                .then(function() {
+                .then(()=>{
                     process.exit(0);
                 })
-                .catch(function(e) {
+                .catch((e)=>{
                     process.stdout.write(util.format("%s%s", e, "\n"));
                     process.exit(-1);
                 });

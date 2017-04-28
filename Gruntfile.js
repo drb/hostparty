@@ -1,8 +1,8 @@
-(function () {
+(()=>{
 
     'use strict';
 
-    module.exports = function(grunt) {
+    module.exports = (grunt)=>{
 
         var _           = require('lodash'),
             util        = require('util'),
@@ -73,4 +73,4 @@
         grunt.registerTask('test', 'simplemocha');
     };
 
-}());
+})();

@@ -13,11 +13,11 @@
  * 1.0.4 / 22 Dec 2016 / Better tests
  **/
 
-(function () {
+(()=>{
 
     var party = require('./lib/party');
 
     // just expose the api directly
     module.exports = party;
-    
+
 })();

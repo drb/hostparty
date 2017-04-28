@@ -1,7 +1,7 @@
 /**
  * Logging tests
  */
-(function () {
+(()=>{
 
     'use strict';
 
@@ -17,7 +17,7 @@
      *
      * @return {[type]}   [description]
      */
-    describe('Hosts file CRUD operations:', function() {
+    describe('Hosts file CRUD operations:', ()=>{
 
         /**
          * sets options
@@ -33,11 +33,11 @@
          *
          * get types of log that are filterable
          */
-        it('Should return all entries in the test hosts file as a dictionary object.', function (done) {
+        it('Should return all entries in the test hosts file as a dictionary object.', (done)=>{
 
             hostparty
                 .list()
-                .then(function(hosts) {
+                .then((hosts)=>{
                     expect(hosts).to.be.an('object');
                     expect(hosts).to.have.property('::1');
                     expect(hosts).to.have.property('1.2.3.4');
@@ -60,17 +60,17 @@
          *
          * get types of log that are filterable
          */
-        it('Add a new entry for IP 1.1.2.2 with 2 host names.', function (done) {
+        it('Add a new entry for IP 1.1.2.2 with 2 host names.', (done)=>{
 
             let ip = '1.1.2.3';
 
             hostparty
                 .add(ip, ['dogs.foo', 'cats.things'])
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.have.property(ip);
                             expect(hosts[ip]).to.have.length(2);
@@ -89,18 +89,18 @@
          *
          * get types of log that are filterable
          */
-        it('Remove hostname entry from 1.1.2.2.', function (done) {
+        it('Remove hostname entry from 1.1.2.2.', (done)=>{
 
             let ip = '1.1.2.3',
                 host = 'cats.things';
 
             hostparty
                 .purge(host)
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.have.property(ip);
                             expect(hosts[ip]).to.have.length(1);
@@ -119,18 +119,18 @@
          *
          * get types of log that are filterable
          */
-        it('Remove another hostname entry from 1.1.2.2, removing the IP entirely', function (done) {
+        it('Remove another hostname entry from 1.1.2.2, removing the IP entirely', (done)=>{
 
             let ip = '1.1.2.3',
                 host = 'dogs.foo';
 
             hostparty
                 .purge(host)
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.not.have.property(ip);
                             done();
@@ -146,17 +146,17 @@
          *
          * get types of log that are filterable
          */
-        it('Add a new entry for IPv6 2001:0db8:85a3:0000:0000:8a2e:0370:7334 with 2 host names.', function (done) {
+        it('Add a new entry for IPv6 2001:0db8:85a3:0000:0000:8a2e:0370:7334 with 2 host names.', (done)=>{
 
             let ipv6 = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
 
             hostparty
                 .add(ipv6, ['ipv6.test.com'])
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.have.property(ipv6);
                             expect(hosts[ipv6]).to.have.length(1);
@@ -165,7 +165,7 @@
                         })
                         .catch(done);
                 })
-                .catch(function(e) {
+                .catch((e)=>{
                     done(e);
                 });
         });
@@ -176,20 +176,20 @@
          *
          * get types of log that are filterable
          */
-        it('Add bad IP and fail.', function (done) {
+        it('Add bad IP and fail.', (done)=>{
 
             let badIp = 'x1.2.d3.a4';
 
             hostparty
                 .add(badIp, ['irrelevant.com'])
-                .then(function() {
+                .then(()=>{
                     done(new Error('Failed to trap error'));
                 })
-                .catch(function() {
+                .catch(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.not.have.property(badIp);
                             done();
@@ -204,17 +204,17 @@
          *
          * get types of log that are filterable
          */
-        it('Removes a host name [foo.net].', function (done) {
+        it('Removes a host name [foo.net].', (done)=>{
 
             let removedHost = 'foo.net';
 
             hostparty
                 .purge(removedHost)
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts['10.5.6.7']).to.not.include(removedHost);
                             done();
@@ -230,24 +230,24 @@
          *
          * get types of log that are filterable
          */
-        it('Removes an IP address [8.8.4.4] and all mapped hosts.', function (done) {
+        it('Removes an IP address [8.8.4.4] and all mapped hosts.', (done)=>{
 
             let ip = '8.8.4.4';
 
             hostparty
                 .remove(ip)
-                .then(function() {
+                .then(()=>{
 
                     hostparty
                         .list()
-                        .then(function(hosts) {
+                        .then((hosts)=>{
                             expect(hosts).to.be.an('object');
                             expect(hosts).to.not.have.property(ip);
                             done();
                         })
                         .catch(done);
                 })
-                .catch(function(e) {
+                .catch((e)=>{
                     done(new Error(e));
                 });
         });
@@ -258,14 +258,14 @@
          *
          * tries to delete a known protected ip. expected to fail.
          */
-        it('Attempt to remove a protected IP address [::1] and be rejected.', function (done) {
+        it('Attempt to remove a protected IP address [::1] and be rejected.', (done)=>{
 
             hostparty
                 .remove('::1')
-                .then(function() {
+                .then(()=>{
                     done(new Error('Failed to trap error'));
                 })
-                .catch(function() {
+                .catch(()=>{
                     done();
                 });
         });
@@ -326,4 +326,4 @@
         //         });
         // });
     });
-}());
+})();

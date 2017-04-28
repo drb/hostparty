@@ -4,7 +4,7 @@
  * @param  {[type]} 'supertest' [description]
  * @return {[type]}             [description]
  */
- (function () {
+ (()=>{
 
     'use strict';
 
@@ -21,40 +21,40 @@
         };
 
     // executed before any tests
-    before(function() {
+    before(()=>{
 
         // copy source file
         fs.writeFileSync(config.path, fs.readFileSync(config.orig));
 
         // pre-api call
-        it('Should load the test data from a known source file and copy into a temp directory to do operations on.', function (done) {
+        it('Should load the test data from a known source file and copy into a temp directory to do operations on.', (done)=>{
             done();
         });
     });
 
 
     // executed before each test
-    beforeEach(function(done) {
+    beforeEach((done)=>{
         done();
     });
 
     // executed after each test
-    afterEach(function(done) {
+    afterEach((done)=>{
         done();
     });
 
     // executed after all tests
-    after(function() {
+    after(()=>{
 
         // remove the file
         fs  .unlinkAsync(config.path)
-            .then(function() {
+            .then(()=>{
                 // console.log("Cleanup done");
             })
-            .catch(function(e) {
+            .catch((e)=>{
                 // console.log("Cleanup failed", e);
             })
-            .lastly(function() {
+            .lastly(()=>{
                 // reset config
                 config = {};
             });
@@ -62,4 +62,4 @@
 
     module.exports = config;
 
-}());
+})();
