@@ -24,9 +24,9 @@
   "author": "Dave Bullough <dave.bullough@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.4.6",
-    "cli-color": "^1.1.0",
-    "commander": "^2.9.0",
+    "bluebird": "^3.5.0",
+    "cli-color": "^1.2.0",
+    "commander": "^2.11.0",
     "is-ip": "^1.0.0",
     "lodash": "^4.16.6",
     "text-table": "^0.2.0"
