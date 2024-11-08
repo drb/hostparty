@@ -2,29 +2,29 @@
 
 (()=>{
 
-    var pkg         = require('../package.json'),
-        party       = require('../lib/party'),
+    const   pkg         = require('../package.json'),
+            party       = require('../lib/party'),
 
-        //
-        _           = require('lodash'),
-        util        = require('util'),
-        promise     = require('bluebird'),
-        program     = require('commander'),
-        table       = require('text-table'),
-        color       = require('cli-color');
-        // ansiTrim    = require('cli-color/lib/trim'),
+            //
+            _           = require('lodash'),
+            util        = require('util'),
+            promise     = require('bluebird'),
+            program     = require('commander'),
+            table       = require('text-table'),
+            color       = require('cli-color');
+            // ansiTrim    = require('cli-color/lib/trim'),
 
-    var options = {
+    const options = {
         path: {
-            flag:           '-p, --path [path]',
+            flag:           '--path [path]',
             description:    'Path to the host file (mutes auto-detection)'
         },
         force: {
-            flag:           '-f, --force',
+            flag:           '--force',
             description:    'Overrides checks & forces changes. Use with caution.'
         },
         group: {
-            flag:           '-ng, --no-group',
+            flag:           '--no-group',
             description:    'One line per hostname, instead of grouping.'
         }
     };

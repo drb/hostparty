@@ -54,7 +54,7 @@
             .catch((e)=>{
                 // console.log("Cleanup failed", e);
             })
-            .lastly(()=>{
+            .finally(()=>{
                 // reset config
                 config = {};
             });

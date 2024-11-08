@@ -15,7 +15,7 @@
 
 (()=>{
 
-    var party = require('./lib/party');
+    const party = require('./lib/party');
 
     // just expose the api directly
     module.exports = party;
