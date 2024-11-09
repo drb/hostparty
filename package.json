@@ -1,6 +1,6 @@
 {
   "name": "hostparty",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
