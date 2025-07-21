@@ -47,7 +47,7 @@
     after(()=>{
 
         // remove the file
-        fs  .unlinkAsync(config.path)
+        fs.promises.unlink(config.path)
             .then(()=>{
                 // console.log("Cleanup done");
             })

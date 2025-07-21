@@ -100,6 +100,29 @@ From hostparty --help:
     -V, --version       Output the version number
 ```
 
+### Smart Argument Detection:
+
+hostparty now includes intelligent argument detection that helps prevent common mistakes when using the CLI `add` command.
+
+If you accidentally swap the IP address and hostname arguments, hostparty will detect this and offer to correct it:
+
+```bash
+# If you accidentally type hostname first:
+$ hostparty add example.com 192.168.1.100
+
+# hostparty will detect the swap and prompt:
+Warning: Arguments might be swapped. Did you mean: 192.168.1.100 example.com?
+Use the suggested order? (y/n): y
+Using corrected order.
+1 hostname(s) added to IP 192.168.1.100
+```
+
+This feature works by:
+- Validating that the first argument is a valid IP address
+- Validating that subsequent arguments are valid hostnames
+- Offering to swap them if the pattern suggests they're in the wrong order
+- Only prompting when there's exactly one hostname provided
+
 ### Notes:
 
 Some entries such as `::1` on OSX is protected from calls to `remove()` as this is a loopback address used by the operating system during the boot cycle. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected unless the `--force` flag is used.

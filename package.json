@@ -1,6 +1,6 @@
 {
   "name": "hostparty",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Programmatic and CLI editing for OS hosts file",
   "main": "app.js",
   "scripts": {
@@ -24,21 +24,20 @@
   "author": "Dave Bullough <dave.bullough@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "cli-color": "^1.2.0",
-    "commander": "^2.11.0",
-    "is-ip": "^1.0.0",
-    "lodash": "^4.16.6",
+    "cli-color": "^2.0.4",
+    "commander": "^14.0.0",
+    "is-ip": "^5.0.1",
+    "lodash": "^4.17.21",
     "text-table": "^0.2.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-watch": "^1.0.0",
+    "chai": "^5.2.1",
+    "grunt": "^1.6.1",
+    "grunt-contrib-jshint": "^3.2.0",
+    "grunt-contrib-watch": "^1.1.0",
     "grunt-simple-mocha": "^0.4.1",
-    "jshint-stylish": "^2.2.0",
-    "mocha": "^2.4.5",
-    "supertest": "^2.0.1"
+    "jshint-stylish": "^2.2.1",
+    "mocha": "^11.7.1",
+    "supertest": "^7.1.3"
   }
 }

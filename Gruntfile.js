@@ -6,11 +6,8 @@
 
         var _           = require('lodash'),
             util        = require('util'),
-            promise     = require('bluebird'),
             path        = require('path'),
-
-            // promisifyAll the fs module...
-            fs          = promise.promisifyAll(require('fs'));
+            fs          = require('fs').promises;
 
         grunt.initConfig({
 

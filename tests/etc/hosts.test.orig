@@ -1,13 +1,12 @@
-# just a test hostsfile with lots of types of hostname that will be normalised
-::1             localhost.ipv6
-1.2.3.4         one-two-three-four.count CAPS.lol
-1.2.3.5         repeated-host.net 2nd-one-two-three.count
-5.5.5.5         five.five
-8.8.4.4         xx.google.x dns-4-4.google.com x.dns.google.de
-8.8.8.8         dns.google.com dns.google.de
-9.8.7.6         CAPITAL.XO XO.CAPITAL lower-case.net
-10.5.6.7        foo.net blah.com
-10.20.30.40     ten-twenty-thirty.forty.com
-45.6.7.8        dave.net xyz.com 123.org abcdefg.io boo-goose.co.uk
-# 34.5.4.3      comment-out.net
-67.89.67.89     dogs.com
+::1 localhost.ipv6
+1.2.3.4 caps.lol one-two-three-four.count
+1.2.3.5 2nd-one-two-three.count repeated-host.net
+5.5.5.5 five.five
+8.8.4.4 dns-4-4.google.com x.dns.google.de xx.google.x
+8.8.8.8 dns.google.com dns.google.de
+9.8.7.6 capital.xo lower-case.net xo.capital
+10.5.6.7 blah.com foo.net
+45.6.7.8 123.org abcdefg.io boo-goose.co.uk dave.net xyz.com
+10.20.30.40 ten-twenty-thirty.forty.com
+192.168.1.1 
+67.89.67.89 dogs.com

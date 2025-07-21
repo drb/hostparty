@@ -1,11 +1,30 @@
 language: node_js
+
+# Test on current supported Node.js versions
+node_js:
+  - "18"    # LTS until April 2025
+  - "20"    # Active LTS until April 2027
+  - "22"    # Current release
+
+# Cache node_modules for faster builds
+cache:
+  directories:
+    - "node_modules"
+
+# Only build on specific branches
 branches:
   only:
     - master
-node_js:
-  - "node"
-  - "6"
-  - "5"
-  - "4"
+    - main
+
+# Install dependencies
 before_script:
   - npm install -g grunt-cli
+
+# Run tests
+script:
+  - npm test
+
+# Notifications (optional - can be disabled)
+notifications:
+  email: false

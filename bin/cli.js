@@ -4,15 +4,17 @@
 
     const   pkg         = require('../package.json'),
             party       = require('../lib/party'),
+            utils       = require('../lib/utils'),
+            constants   = require('../lib/constants'),
 
             //
             _           = require('lodash'),
             util        = require('util'),
-            promise     = require('bluebird'),
-            program     = require('commander'),
+            readline    = require('readline'),
+            { program } = require('commander'),
             table       = require('text-table'),
             color       = require('cli-color');
-            // ansiTrim    = require('cli-color/lib/trim'),
+            // ansiTrim    = require('cli-color/lib/trim')
 
     const options = {
         path: {
@@ -30,6 +32,23 @@
     };
 
     /**
+     * helper function to prompt user for input
+     */
+    const promptUser = (question) => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        return new Promise((resolve) => {
+            rl.question(question, (answer) => {
+                rl.close();
+                resolve(answer.toLowerCase().trim());
+            });
+        });
+    };
+
+    /**
      * pull the version out for calls to --version
      */
     program.version(pkg.version);
@@ -37,7 +56,7 @@
     /**
      * list
      *
-     * spits out the hosts file in tabular format
+     * outputs the hosts file in tabular format
      */
     program
         .command('list [hostname]')
@@ -57,7 +76,7 @@
                 .then((hosts)=>{
 
                     var opts = {
-                            hsep: ' | ',
+                            hsep: constants.OUTPUT.TABLE_SEPARATOR,
                             // stringLength: function(s) { return ansiTrim(s).length; }
                         },
                         o = [],
@@ -70,7 +89,7 @@
                             o.push([ip].concat(hosts));
                         } else {
 
-                            // don't group - 1 line per IP
+                            // don't group - 1 line per ip
                             hosts.forEach((host)=>{
                                 o.push([ip, host]);
                             });
@@ -98,10 +117,25 @@
         .command('add [ip] [hosts...]')
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
-        .description('Removes all entries for an IP address.')
-        .action((ip, hosts, options)=>{
+        .description('Adds hostname(s) to an IP address.')
+        .action(async (ip, hosts, options)=>{
 
-            // removes the ip
+            // check if arguments might be swapped (only if we have exactly one host)
+            if (hosts && hosts.length === 1) {
+                const swapCheck = utils.detectArgumentSwap(ip, hosts[0]);
+                if (swapCheck.shouldSwap) {
+                    process.stdout.write(util.format("%s%s", color.yellow(`${constants.MESSAGES.ARGUMENT_SWAP_WARNING} ${swapCheck.suggestion}`), constants.OUTPUT.NEWLINE));
+                    const answer = await promptUser(constants.MESSAGES.ARGUMENT_SWAP_PROMPT);
+                    
+                    if (answer === constants.USER_RESPONSES.YES_SHORT || answer === constants.USER_RESPONSES.YES_LONG) {
+                        ip = swapCheck.correctedIP;
+                        hosts = [swapCheck.correctedHost];
+                        process.stdout.write(util.format("%s%s", color.green(constants.MESSAGES.ORDER_CORRECTED), constants.OUTPUT.NEWLINE));
+                    }
+                }
+            }
+
+            // adds the ip
             party
                 .setup({
                     path:   options.path,

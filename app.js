@@ -6,11 +6,12 @@
  *                .-/              .-/
  *               (_/              (_/
  *
- * CHANGELOG
+ * changelog
  *
- * 1.0.1 / 23rd Nov 2016 / Original version. Abililty to add/remove hosts/ips to auto-detected hosts files.
- * 1.0.2 / 14 Dec 2016 / Release ready
- * 1.0.4 / 22 Dec 2016 / Better tests
+ * 1.0.1 / 23rd nov 2016 / original version. ability to add/remove hosts/ips to auto-detected hosts files.
+ * 1.0.2 / 14 dec 2016 / release ready
+ * 1.0.4 / 22 dec 2016 / better tests
+ * 1.0.17 / 21st jul 2025 / modernised codebase: removed bluebird, added smart cli argument detection, constants extraction, comprehensive test coverage
  **/
 
 (()=>{

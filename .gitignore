@@ -1,3 +1,4 @@
 node_modules/
 *.bak
 tests/etc/hosts.*.tmp
+.claude/
