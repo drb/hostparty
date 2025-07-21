@@ -24,56 +24,47 @@ Or, `require('hostparty')` in your own applications to use the API:
 
 ### API:
 
-All API methods return thenable promises.
+All API methods return promises and can be used with async/await.
 
 ```javascript
-let party = require('hostparty');
-
+const party = require("hostparty");
 
 // add a couple of hosts mapping to ip 127.0.0.1
-party.add('127.0.0.1', ['party-started.com', 'party-pooper.com']);
-
+await party.add("127.0.0.1", ["party-started.com", "party-pooper.com"]);
 
 // see who we have in our hosts file
-party.list().then((hosts)=>{
-
-    // `hosts` is an object containing the ip as a key, and the hostnames(s) bound as an array
-    // 127.0.0.1 party-started.com party-pooper.com
-});
-
+const hosts = await party.list();
+// `hosts` is an object containing the ip as a key, and the hostnames(s) bound as an array
+// 127.0.0.1 party-started.com party-pooper.com
 
 // remove the party pooper from its bound ip
-party.purge('party-pooper.com');
-
+await party.purge("party-pooper.com");
 
 // remove all entries pointing to ips 127.0.0.1 and 8.8.4.4
-party.remove(['127.0.0.1', '8.8.4.4']);
-
+await party.remove(["127.0.0.1", "8.8.4.4"]);
 
 // try and remove a protected IP
-party
-    .remove('::1')
-    .then(()=>{
-        console.log("All good");
-    })
-    .catch((e)=>{
-        console.error('Error found [%s]. Try using the force flag.', e.message);
-    });
-
+try {
+  await party.remove("::1");
+  console.log("All good");
+} catch (e) {
+  console.error("Error found [%s]. Try using the force flag.", e.message);
+}
 
 // set options to change the default path, and override any warnings
-party
+try {
+  await party
     .setup({
-        // override the path to the file
-        path:   '~/my-own/hosts',
-        // ignores validation
-        force:  true
+      // override the path to the file
+      path: "~/my-own/hosts",
+      // ignores validation
+      force: true,
     })
-    .remove('::1')
-    .then(()=>{
-        console.log("All good");
-    });
-
+    .remove("::1");
+  console.log("All good");
+} catch (e) {
+  console.error("Error:", e.message);
+}
 ```
 
 ### CLI Usage:
@@ -118,6 +109,7 @@ Using corrected order.
 ```
 
 This feature works by:
+
 - Validating that the first argument is a valid IP address
 - Validating that subsequent arguments are valid hostnames
 - Offering to swap them if the pattern suggests they're in the wrong order
