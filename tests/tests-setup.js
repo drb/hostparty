@@ -11,7 +11,6 @@
     var fs      = require('fs'),
         path    = require('path'),
         util    = require('util'),
-        request = require('supertest'),
         expect  = require('chai').expect,
         config  = {
             // source data

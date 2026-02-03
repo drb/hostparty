@@ -5,8 +5,7 @@
 
     'use strict';
 
-    var request     = require('supertest'),
-        chai        = require('chai'),
+    var chai        = require('chai'),
         hostparty   = require('../lib/party'),
         utils       = require('../lib/utils'),
         constants   = require('../lib/constants'),
@@ -49,6 +48,70 @@
                     expect(hosts).to.have.property('10.5.6.7');
                     expect(hosts).to.have.property('10.20.30.40');
                     expect(hosts).to.have.property('45.6.7.8');
+                    expect(hosts).to.have.property('67.89.67.89');
+                    expect(hosts).to.have.property('172.16.0.1');
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should merge duplicate IPs from multiple lines.', (done)=>{
+
+            hostparty
+                .list()
+                .then((hosts)=>{
+                    // 67.89.67.89 appears on two lines with dogs.com and cats.com
+                    expect(hosts['67.89.67.89']).to.include('dogs.com');
+                    expect(hosts['67.89.67.89']).to.include('cats.com');
+                    expect(hosts['67.89.67.89']).to.have.length(2);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should ignore comment lines.', (done)=>{
+
+            hostparty
+                .list()
+                .then((hosts)=>{
+                    // Comments should not appear as IPs
+                    const ips = Object.keys(hosts);
+                    const hasCommentAsIP = ips.some(ip => ip.startsWith('#'));
+                    expect(hasCommentAsIP).to.be.false;
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should handle tabs and multiple spaces as delimiters.', (done)=>{
+
+            hostparty
+                .list()
+                .then((hosts)=>{
+                    // 1.2.3.4 uses tabs, 5.5.5.5 uses multiple spaces
+                    expect(hosts['1.2.3.4']).to.include('caps.lol');
+                    expect(hosts['5.5.5.5']).to.include('five.five');
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should merge hostnames when adding to existing IP.', (done)=>{
+
+            const existingIP = '8.8.8.8'; // already has dns.google.com, dns.google.de
+            const newHost = 'new-host.google.com';
+
+            hostparty
+                .add(existingIP, [newHost])
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    // Should have original hosts plus new one
+                    expect(hosts[existingIP]).to.include('dns.google.com');
+                    expect(hosts[existingIP]).to.include('dns.google.de');
+                    expect(hosts[existingIP]).to.include(newHost);
+                    expect(hosts[existingIP].length).to.be.at.least(3);
                     done();
                 })
                 .catch(done);
@@ -95,7 +158,7 @@
                 host = 'cats.things';
 
             hostparty
-                .purge(host)
+                .removeHost(host)
                 .then(()=>{
 
                     hostparty
@@ -125,7 +188,7 @@
                 host = 'dogs.foo';
 
             hostparty
-                .purge(host)
+                .removeHost(host)
                 .then(()=>{
 
                     hostparty
@@ -209,7 +272,7 @@
             let removedHost = 'foo.net';
 
             hostparty
-                .purge(removedHost)
+                .removeHost(removedHost)
                 .then(()=>{
 
                     hostparty
@@ -235,7 +298,7 @@
             let ip = '8.8.4.4';
 
             hostparty
-                .remove(ip)
+                .removeIP(ip)
                 .then(()=>{
 
                     hostparty
@@ -261,7 +324,7 @@
         it('Attempt to remove a protected IP address [::1] and be rejected.', (done)=>{
 
             hostparty
-                .remove('::1')
+                .removeIP('::1')
                 .then(()=>{
                     done(new Error('Failed to trap error'));
                 })
@@ -410,9 +473,71 @@
     });
 
     /**
+     * setup and configuration tests
+     */
+    describe('Setup and configuration:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            // Reset file to original state before each test
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, force: false });
+        });
+
+        it('Should return hostparty instance for chaining', (done) => {
+            const result = hostparty.setup({ force: false });
+            expect(result).to.equal(hostparty);
+            done();
+        });
+
+        it('Should allow chained method calls', (done) => {
+            hostparty
+                .setup({ path: hooks.path, force: false })
+                .list()
+                .then((hosts) => {
+                    expect(hosts).to.be.an('object');
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should allow force removal of protected IP', (done) => {
+            // First verify ::1 exists
+            hostparty
+                .list()
+                .then((hosts) => {
+                    expect(hosts).to.have.property('::1');
+                    // Now force remove it
+                    return hostparty
+                        .setup({ path: hooks.path, force: true })
+                        .removeIP('::1');
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.not.have.property('::1');
+                    done();
+                })
+                .catch(done);
+        });
+    });
+
+    /**
      * error handling and edge case tests
      */
     describe('Error handling and edge cases:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            // Reset file to original state before each test
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, force: false });
+        });
 
         it('Should reject empty IP when adding', (done) => {
             hostparty
@@ -486,7 +611,7 @@
 
         it('Should reject removing non-existent IP', (done) => {
             hostparty
-                .remove('99.99.99.99')
+                .removeIP('99.99.99.99')
                 .then(() => {
                     done(new Error('Should have rejected removing non-existent IP'));
                 })
@@ -497,7 +622,7 @@
 
         it('Should handle purging non-existent hostname gracefully', (done) => {
             hostparty
-                .purge('non-existent-host.com')
+                .removeHost('non-existent-host.com')
                 .then(() => {
                     // should succeed even if hostname doesn't exist
                     done();
@@ -512,7 +637,7 @@
             hostparty
                 .add(testIP, [testHost])
                 .then(() => {
-                    return hostparty.purge('casesensitive.com'); // different case
+                    return hostparty.removeHost('casesensitive.com'); // different case
                 })
                 .then(() => {
                     return hostparty.list();
@@ -526,11 +651,35 @@
 
         it('Should protect against removing multiple protected IPs', (done) => {
             hostparty
-                .remove(['::1', 'fe80::1%lo0'])
+                .removeIP(['::1', 'fe80::1%lo0'])
                 .then(() => {
                     done(new Error('Should have rejected removing protected IPs'));
                 })
                 .catch(() => {
+                    done();
+                });
+        });
+
+        it('Should protect against removing protected hostnames', (done) => {
+            hostparty
+                .removeHost('localhost')
+                .then(() => {
+                    done(new Error('Should have rejected removing protected hostname'));
+                })
+                .catch((err) => {
+                    expect(err).to.include('protected hostname');
+                    done();
+                });
+        });
+
+        it('Should protect against removing 127.0.0.1', (done) => {
+            hostparty
+                .removeIP('127.0.0.1')
+                .then(() => {
+                    done(new Error('Should have rejected removing 127.0.0.1'));
+                })
+                .catch((err) => {
+                    expect(err).to.include('protected');
                     done();
                 });
         });
@@ -563,25 +712,26 @@
     });
 
     /**
-     * filtering and listing tests
+     * filtering and listing tests - uses fresh copy of test data
      */
     describe('Filtering and listing:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            // Reset file to original state before each test
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+        });
 
         it('Should filter hosts by hostname pattern', (done) => {
             hostparty
                 .list('com')
                 .then((hosts) => {
                     expect(hosts).to.be.an('object');
-                    // should find entries with '.com' in hostname
-                    let foundPattern = false;
-                    Object.values(hosts).forEach(hostList => {
-                        hostList.forEach(host => {
-                            if (host.includes('com')) {
-                                foundPattern = true;
-                            }
-                        });
-                    });
-                    expect(foundPattern).to.be.true;
+                    const allHosts = Object.values(hosts).flat();
+                    const hasComHosts = allHosts.some(host => host.includes('com'));
+                    expect(hasComHosts).to.be.true;
                     done();
                 })
                 .catch(done);
@@ -618,9 +768,14 @@
         });
 
         it('Should have correct protected entries', (done) => {
+            // Protected IPs
+            expect(constants.PROTECTED_ENTRIES.IPS).to.include('127.0.0.1');
             expect(constants.PROTECTED_ENTRIES.IPS).to.include('::1');
             expect(constants.PROTECTED_ENTRIES.IPS).to.include('fe80::1%lo0');
+            expect(constants.PROTECTED_ENTRIES.IPS).to.include('255.255.255.255');
+            // Protected hostnames
             expect(constants.PROTECTED_ENTRIES.HOSTS).to.include('localhost');
+            expect(constants.PROTECTED_ENTRIES.HOSTS).to.include('broadcasthost');
             done();
         });
 

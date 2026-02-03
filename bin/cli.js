@@ -157,10 +157,10 @@
 
 
     /**
-     * remove
+     * remove-ip
      */
     program
-        .command('remove [ips...]')
+        .command('remove-ip [ips...]')
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
         .description('Removes all entries for an IP address.')
@@ -172,7 +172,7 @@
                     path:   options.path,
                     force:  options.force
                 })
-                .remove(ip)
+                .removeIP(ip)
                 .then(()=>{
                     process.stdout.write(util.format("%s removed from file%s", ip.join(', '), "\n"));
                 })
@@ -187,13 +187,13 @@
 
 
     /**
-     * purge
+     * remove-host
      */
     program
-        .command('purge [hosts...]')
+        .command('remove-host [hosts...]')
         .option(options.path.flag, options.path.description)
         .option(options.force.flag, options.force.description)
-        .description('Removes all host(s) specified.')
+        .description('Removes hostname(s) from any IP.')
         .action((hostname, options)=>{
 
             // removes the hostname(s) specified
@@ -202,7 +202,7 @@
                     path:   options.path,
                     force:  options.force
                 })
-                .purge(hostname)
+                .removeHost(hostname)
                 .then(()=>{
                     process.stdout.write(util.format("%s removed from file%s", hostname.join(', '), "\n"));
                 })

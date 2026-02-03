@@ -1,122 +1,224 @@
-```
-      /)
-    (/   ___ _  _/___   _   __ _/_
-    / )_(_) /_)_(__/_)_(_(_/ (_(__(_/_ 🎉
-                .-/              .-/
-               (_/              (_/
-```
+# hostparty
 
-## Cross platform CLI editor & JavaScript API for managing your hostsfile.
+[![npm version](https://img.shields.io/npm/v/hostparty.svg)](https://www.npmjs.com/package/hostparty)
 
-![NPM Stats](https://nodei.co/npm/hostparty.png?downloads=true&downloadRank=true&stars=true)
+Cross-platform CLI and JavaScript API for managing your hosts file.
 
-[![Build Status](https://travis-ci.org/drb/hostparty.svg)](https://travis-ci.org/drb/hostparty) [![npm version](https://badge.fury.io/js/hostparty.svg)](http://badge.fury.io/js/hostparty)
-
-### Installing:
-
-To use as a CLI tool, you can install hostparty globally.
-
-`npm install -g hostparty`
-
-Or, `require('hostparty')` in your own applications to use the API:
-
-`npm install hostparty --save`
-
-### API:
-
-All API methods return promises and can be used with async/await.
-
-```javascript
-const party = require("hostparty");
-
-// add a couple of hosts mapping to ip 127.0.0.1
-await party.add("127.0.0.1", ["party-started.com", "party-pooper.com"]);
-
-// see who we have in our hosts file
-const hosts = await party.list();
-// `hosts` is an object containing the ip as a key, and the hostnames(s) bound as an array
-// 127.0.0.1 party-started.com party-pooper.com
-
-// remove the party pooper from its bound ip
-await party.purge("party-pooper.com");
-
-// remove all entries pointing to ips 127.0.0.1 and 8.8.4.4
-await party.remove(["127.0.0.1", "8.8.4.4"]);
-
-// try and remove a protected IP
-try {
-  await party.remove("::1");
-  console.log("All good");
-} catch (e) {
-  console.error("Error found [%s]. Try using the force flag.", e.message);
-}
-
-// set options to change the default path, and override any warnings
-try {
-  await party
-    .setup({
-      // override the path to the file
-      path: "~/my-own/hosts",
-      // ignores validation
-      force: true,
-    })
-    .remove("::1");
-  console.log("All good");
-} catch (e) {
-  console.error("Error:", e.message);
-}
-```
-
-### CLI Usage:
-
-From hostparty --help:
-
-```
-  Usage: hostparty [options] [command]
-
-
-  Commands:
-
-    list [options] [hostname]      Outputs the hosts file with optional matching hostname.
-    add [options] [ip] [hosts...]  Adds a new host(s) entry for an IP address.
-    remove [options] [ips...]      Removes all entries for an IP address.
-    purge [options] [hosts...]     Removes all host(s) specified.
-
-  Options:
-
-    -p, --path          Path to file (auto-detection is enabled by default)
-    -f, --force         Disable any validation on protected methods
-    -ng, --no-group     Don't group by IP
-    -h, --help          Output usage information
-    -V, --version       Output the version number
-```
-
-### Smart Argument Detection:
-
-hostparty now includes intelligent argument detection that helps prevent common mistakes when using the CLI `add` command.
-
-If you accidentally swap the IP address and hostname arguments, hostparty will detect this and offer to correct it:
+## Installation
 
 ```bash
-# If you accidentally type hostname first:
+# CLI usage
+npm install -g hostparty
+
+# Library usage
+npm install hostparty
+```
+
+## Quick Start
+
+### As a Library
+
+```javascript
+import party from 'hostparty';
+
+// Add hosts to an IP
+await party.add('127.0.0.1', ['myapp.local', 'api.local']);
+
+// List all host entries
+const hosts = await party.list();
+// { '127.0.0.1': ['myapp.local', 'api.local'] }
+
+// Remove specific hostnames
+await party.removeHost('api.local');
+
+// Remove all entries for an IP
+await party.removeIP('127.0.0.1');
+```
+
+### Configuration
+
+```javascript
+import party from 'hostparty';
+
+// Custom hosts file path and force mode
+party.setup({
+  path: '~/my-own/hosts',
+  force: true
+});
+
+await party.remove('::1');  // Normally protected, but force allows it
+```
+
+### CommonJS
+
+```javascript
+const party = require('hostparty');
+
+await party.add('127.0.0.1', ['example.local']);
+```
+
+---
+
+## API Reference
+
+All methods return Promises.
+
+### `party.add(ip, hosts)`
+
+Add hostname(s) to an IP address.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ip` | `string` | IP address to map to |
+| `hosts` | `string \| string[]` | Hostname(s) to add |
+
+```javascript
+await party.add('127.0.0.1', ['site.local', 'api.local']);
+```
+
+### `party.list([hostname])`
+
+List all entries, optionally filtered by hostname.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hostname` | `string` | Optional hostname to filter by |
+
+```javascript
+const all = await party.list();
+const filtered = await party.list('myapp.local');
+```
+
+### `party.removeIP(ips)`
+
+Remove all entries for the specified IP address(es).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ips` | `string \| string[]` | IP address(es) to remove |
+
+```javascript
+await party.removeIP(['127.0.0.1', '8.8.4.4']);
+```
+
+### `party.removeHost(hosts)`
+
+Remove specific hostname(s) from any IP.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hosts` | `string \| string[]` | Hostname(s) to remove |
+
+```javascript
+await party.removeHost('old-site.local');
+```
+
+### `party.setup(options)`
+
+Configure hostparty. Returns the party instance for chaining.
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `path` | `string` | Custom path to hosts file |
+| `force` | `boolean` | Bypass protection on system entries |
+
+```javascript
+party.setup({ path: '/custom/hosts', force: true }).remove('::1');
+```
+
+---
+
+## CLI Reference
+
+```
+Usage: hostparty [options] [command]
+
+Commands:
+  list [options] [hostname]          Output hosts file, optionally filtered
+  add [options] [ip] [hosts...]      Add hostname(s) to an IP address
+  remove-ip [options] [ips...]       Remove all entries for IP address(es)
+  remove-host [options] [hosts...]   Remove specific hostname(s)
+
+Options:
+  -p, --path      Path to hosts file (auto-detected by default)
+  -f, --force     Bypass validation on protected entries
+  -ng, --no-group Don't group output by IP
+  -h, --help      Show help
+  -V, --version   Show version
+```
+
+### Examples
+
+```bash
+# Add hosts
+hostparty add 127.0.0.1 myapp.local api.local
+
+# List all entries
+hostparty list
+
+# List entries matching a hostname
+hostparty list myapp
+
+# Remove all entries for an IP
+hostparty remove-ip 127.0.0.1
+
+# Remove specific hostnames
+hostparty remove-host old-site.local
+```
+
+### Smart Argument Detection
+
+If you accidentally swap arguments, hostparty detects and offers to correct:
+
+```bash
 $ hostparty add example.com 192.168.1.100
 
-# hostparty will detect the swap and prompt:
 Warning: Arguments might be swapped. Did you mean: 192.168.1.100 example.com?
 Use the suggested order? (y/n): y
 Using corrected order.
 1 hostname(s) added to IP 192.168.1.100
 ```
 
-This feature works by:
+---
 
-- Validating that the first argument is a valid IP address
-- Validating that subsequent arguments are valid hostnames
-- Offering to swap them if the pattern suggests they're in the wrong order
-- Only prompting when there's exactly one hostname provided
+## Protected Entries
 
-### Notes:
+Certain entries are protected from accidental removal as they're critical for OS networking. Attempting to remove these without the `force` flag will result in an error.
 
-Some entries such as `::1` on OSX is protected from calls to `remove()` as this is a loopback address used by the operating system during the boot cycle. Purge is supported for hosts bound to the address, but a purge on `localhost` for this IP is protected unless the `--force` flag is used.
+### Protected IP Addresses
 
-More docs coming! 🎉
+| IP | Purpose | OS |
+|----|---------|-----|
+| `127.0.0.1` | IPv4 loopback | All |
+| `::1` | IPv6 loopback | All |
+| `fe80::1%lo0` | Link-local address | macOS |
+| `255.255.255.255` | Broadcast address | macOS |
+
+### Protected Hostnames
+
+| Hostname | Purpose | OS |
+|----------|---------|-----|
+| `localhost` | Loopback hostname | All |
+| `broadcasthost` | Broadcast hostname | macOS |
+
+### Overriding Protection
+
+Use the `--force` flag (CLI) or `force: true` option (API) to remove protected entries:
+
+```bash
+# CLI
+hostparty remove-ip 127.0.0.1 --force
+hostparty remove-host localhost --force
+```
+
+```javascript
+// API
+party.setup({ force: true }).removeIP('127.0.0.1');
+party.setup({ force: true }).removeHost('localhost');
+```
+
+**Warning:** Removing these entries can break networking on your system. Use with caution.
+
+## License
+
+MIT
