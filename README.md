@@ -46,7 +46,7 @@ party.setup({
   force: true
 });
 
-await party.remove('::1');  // Normally protected, but force allows it
+await party.removeIP('::1');  // Normally protected, but force allows it
 ```
 
 ### CommonJS
@@ -123,7 +123,7 @@ Configure hostparty. Returns the party instance for chaining.
 | `force` | `boolean` | Bypass protection on system entries |
 
 ```javascript
-party.setup({ path: '/custom/hosts', force: true }).remove('::1');
+party.setup({ path: '/custom/hosts', force: true }).removeIP('::1');
 ```
 
 ---
