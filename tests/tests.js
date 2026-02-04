@@ -19,12 +19,15 @@
     describe('Hosts file CRUD operations:', ()=>{
 
         /**
-         * sets options
+         * sets options before each test
          */
-        hostparty.setup({
-
-            // set the path manually. overrides the host mapping.
-            path: hooks.path
+        beforeEach(() => {
+            hostparty.setup({
+                // set the path manually. overrides the host mapping.
+                path: hooks.path,
+                // disable backups during tests
+                autoBackup: false
+            });
         });
 
         /**
@@ -483,11 +486,11 @@
         beforeEach(() => {
             // Reset file to original state before each test
             fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
-            hostparty.setup({ path: hooks.path, force: false });
+            hostparty.setup({ path: hooks.path, force: false, autoBackup: false });
         });
 
         it('Should return hostparty instance for chaining', (done) => {
-            const result = hostparty.setup({ force: false });
+            const result = hostparty.setup({ force: false, autoBackup: false });
             expect(result).to.equal(hostparty);
             done();
         });
@@ -536,7 +539,7 @@
         beforeEach(() => {
             // Reset file to original state before each test
             fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
-            hostparty.setup({ path: hooks.path, force: false });
+            hostparty.setup({ path: hooks.path, force: false, autoBackup: false });
         });
 
         it('Should reject empty IP when adding', (done) => {
@@ -717,11 +720,14 @@
     describe('Filtering and listing:', () => {
 
         const fs = require('fs');
+        const fsPromises = require('fs').promises;
         const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
 
-        beforeEach(() => {
-            // Reset file to original state before each test
-            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+        beforeEach(async () => {
+            // Reset file to original state before each test (async to ensure flush)
+            const content = await fsPromises.readFile(origPath);
+            await fsPromises.writeFile(hooks.path, content);
+            hostparty.setup({ path: hooks.path, autoBackup: false });
         });
 
         it('Should filter hosts by hostname pattern', (done) => {
@@ -784,6 +790,434 @@
             expect(constants.PLATFORMS.DARWIN).to.equal('darwin');
             expect(constants.PLATFORMS.WIN32).to.equal('win32');
             done();
+        });
+    });
+
+    /**
+     * disable/enable tests
+     */
+    describe('Disable and enable operations:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, force: false, autoBackup: false });
+        });
+
+        it('Should disable an IP entry', (done) => {
+            const testIP = '10.20.30.40';
+
+            hostparty
+                .disable(testIP)
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.not.have.property(testIP);
+                    expect(hosts).to.have.property('# ' + testIP);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should enable a previously disabled IP entry', (done) => {
+            const testIP = '10.20.30.40';
+
+            hostparty
+                .disable(testIP)
+                .then(() => {
+                    return hostparty.enable(testIP);
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.have.property(testIP);
+                    expect(hosts).to.not.have.property('# ' + testIP);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should reject disabling non-existent IP', (done) => {
+            hostparty
+                .disable('99.99.99.99')
+                .then(() => {
+                    done(new Error('Should have rejected non-existent IP'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+
+        it('Should reject enabling non-disabled IP', (done) => {
+            hostparty
+                .enable('10.20.30.40')
+                .then(() => {
+                    done(new Error('Should have rejected non-disabled IP'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+    });
+
+    /**
+     * search-ip tests
+     */
+    describe('Search by IP operations:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, autoBackup: false });
+        });
+
+        it('Should find hostnames for existing IP', (done) => {
+            hostparty
+                .searchByIP('8.8.8.8')
+                .then((result) => {
+                    expect(result).to.not.be.null;
+                    expect(result.ip).to.equal('8.8.8.8');
+                    expect(result.hostnames).to.be.an('array');
+                    expect(result.hostnames.length).to.be.at.least(1);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should return null for non-existent IP', (done) => {
+            hostparty
+                .searchByIP('99.99.99.99')
+                .then((result) => {
+                    expect(result).to.be.null;
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should reject invalid IP format', (done) => {
+            hostparty
+                .searchByIP('not-an-ip')
+                .then(() => {
+                    done(new Error('Should have rejected invalid IP'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+    });
+
+    /**
+     * replace-ip tests
+     */
+    describe('Replace IP operations:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, force: false, autoBackup: false });
+        });
+
+        it('Should move hostnames from one IP to another', (done) => {
+            const fromIP = '10.20.30.40';
+            const toIP = '10.20.30.50';
+
+            hostparty
+                .list()
+                .then((hosts) => {
+                    expect(hosts).to.have.property(fromIP);
+                    return hostparty.replaceIP(fromIP, toIP);
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.not.have.property(fromIP);
+                    expect(hosts).to.have.property(toIP);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should copy hostnames when --keep-source is used', (done) => {
+            const fromIP = '10.20.30.40';
+            const toIP = '10.20.30.50';
+
+            hostparty
+                .replaceIP(fromIP, toIP, true) // keepSource = true
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.have.property(fromIP);
+                    expect(hosts).to.have.property(toIP);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should reject when source IP does not exist', (done) => {
+            hostparty
+                .replaceIP('99.99.99.99', '10.20.30.50')
+                .then(() => {
+                    done(new Error('Should have rejected non-existent source IP'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+
+        it('Should reject when source and destination are the same', (done) => {
+            hostparty
+                .replaceIP('10.20.30.40', '10.20.30.40')
+                .then(() => {
+                    done(new Error('Should have rejected same source and destination'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+    });
+
+    /**
+     * dry-run tests
+     */
+    describe('Dry-run mode:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+        });
+
+        it('Should return dry-run result without modifying file', (done) => {
+            const testIP = '99.99.99.99';
+            const testHost = 'dryrun.test.com';
+
+            hostparty
+                .setup({ path: hooks.path, dryRun: true, autoBackup: false })
+                .add(testIP, [testHost])
+                .then((result) => {
+                    expect(result).to.have.property('dryRun', true);
+                    expect(result).to.have.property('message');
+                    expect(result).to.have.property('preview');
+                    expect(result.preview).to.include(testIP);
+                    expect(result.preview).to.include(testHost);
+                    // Verify file was NOT modified
+                    return hostparty
+                        .setup({ path: hooks.path, dryRun: false, autoBackup: false })
+                        .list();
+                })
+                .then((hosts) => {
+                    expect(hosts).to.not.have.property(testIP);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should work with removeIP in dry-run mode', (done) => {
+            hostparty
+                .setup({ path: hooks.path, dryRun: true, autoBackup: false })
+                .removeIP('10.20.30.40')
+                .then((result) => {
+                    expect(result).to.have.property('dryRun', true);
+                    expect(result.preview).to.not.include('10.20.30.40');
+                    done();
+                })
+                .catch(done);
+        });
+    });
+
+    /**
+     * backup/restore tests
+     */
+    describe('Backup and restore operations:', () => {
+
+        const fs = require('fs');
+        const path = require('path');
+        const origPath = path.resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, autoBackup: false, dryRun: false });
+        });
+
+        it('Should create a backup file', (done) => {
+            hostparty
+                .createBackup()
+                .then((backupPath) => {
+                    expect(backupPath).to.be.a('string');
+                    expect(backupPath).to.include('hosts.backup.');
+                    // Clean up
+                    return fs.promises.unlink(backupPath);
+                })
+                .then(() => done())
+                .catch(done);
+        });
+
+        it('Should list backup files', (done) => {
+            hostparty
+                .createBackup()
+                .then(() => {
+                    return hostparty.listBackups();
+                })
+                .then((backups) => {
+                    expect(backups).to.be.an('array');
+                    expect(backups.length).to.be.at.least(1);
+                    expect(backups[0]).to.have.property('filename');
+                    expect(backups[0]).to.have.property('path');
+                    // Clean up
+                    return Promise.all(backups.map(b => fs.promises.unlink(b.path).catch(() => {})));
+                })
+                .then(() => done())
+                .catch(done);
+        });
+
+        it('Should restore from backup', (done) => {
+            let backupPath;
+            const testIP = '88.88.88.88';  // Use a unique IP
+
+            // Setup once - make sure we're using the test file
+            hostparty.setup({ path: hooks.path, autoBackup: false });
+
+            // Create backup of current state
+            hostparty
+                .createBackup()
+                .then((bkPath) => {
+                    backupPath = bkPath;
+                    // Add a new IP
+                    return hostparty.add(testIP, ['restore-test.local']);
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    // Verify the IP was added
+                    expect(hosts).to.have.property(testIP);
+                    // Now restore from backup
+                    return hostparty.restore(backupPath);
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    // Verify the IP is no longer present (restored to pre-add state)
+                    expect(hosts).to.not.have.property(testIP);
+                    // Clean up backup file
+                    return fs.promises.unlink(backupPath);
+                })
+                .then(() => done())
+                .catch(done);
+        });
+    });
+
+    /**
+     * move-hostname tests
+     */
+    describe('Move hostname operations:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, force: false, autoBackup: false });
+        });
+
+        it('Should move a hostname to a new IP', (done) => {
+            const hostname = 'caps.lol';
+            const fromIP = '1.2.3.4';
+            const toIP = '99.99.99.99';
+
+            hostparty
+                .list()
+                .then((hosts) => {
+                    expect(hosts[fromIP]).to.include(hostname);
+                    return hostparty.moveHostname(hostname, toIP);
+                })
+                .then(() => {
+                    return hostparty.list();
+                })
+                .then((hosts) => {
+                    expect(hosts[fromIP]).to.not.include(hostname);
+                    expect(hosts[toIP]).to.include(hostname);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should reject moving non-existent hostname', (done) => {
+            hostparty
+                .moveHostname('nonexistent.hostname', '1.2.3.4')
+                .then(() => {
+                    done(new Error('Should have rejected non-existent hostname'));
+                })
+                .catch(() => {
+                    done();
+                });
+        });
+
+        it('Should reject moving to same IP', (done) => {
+            hostparty
+                .moveHostname('caps.lol', '1.2.3.4')
+                .then(() => {
+                    done(new Error('Should have rejected same IP'));
+                })
+                .catch((err) => {
+                    expect(err).to.include('already at IP');
+                    done();
+                });
+        });
+    });
+
+    /**
+     * stats tests
+     */
+    describe('Statistics operations:', () => {
+
+        const fs = require('fs');
+        const origPath = require('path').resolve('./tests/etc/hosts.test.orig');
+
+        beforeEach(() => {
+            fs.writeFileSync(hooks.path, fs.readFileSync(origPath));
+            hostparty.setup({ path: hooks.path, autoBackup: false });
+        });
+
+        it('Should return stats object with correct properties', (done) => {
+            hostparty
+                .getStats()
+                .then((stats) => {
+                    expect(stats).to.have.property('activeIPs');
+                    expect(stats).to.have.property('disabledIPs');
+                    expect(stats).to.have.property('totalIPs');
+                    expect(stats).to.have.property('totalHostnames');
+                    expect(stats).to.have.property('uniqueHostnames');
+                    expect(stats.activeIPs).to.be.a('number');
+                    expect(stats.totalIPs).to.equal(stats.activeIPs + stats.disabledIPs);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('Should count disabled IPs correctly', (done) => {
+            hostparty
+                .disable('10.20.30.40')
+                .then(() => {
+                    return hostparty.getStats();
+                })
+                .then((stats) => {
+                    expect(stats.disabledIPs).to.equal(1);
+                    done();
+                })
+                .catch(done);
         });
     });
 })();
