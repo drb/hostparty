@@ -43,7 +43,10 @@ import party from 'hostparty';
 // Custom hosts file path and force mode
 party.setup({
   path: '~/my-own/hosts',
-  force: true
+  force: true,
+  dryRun: false,      // Preview changes without writing
+  autoBackup: true,   // Auto-backup before changes
+  maxBackups: 10      // Max backups to keep
 });
 
 await party.removeIP('::1');  // Normally protected, but force allows it
@@ -113,14 +116,151 @@ Remove specific hostname(s) from any IP.
 await party.removeHost('old-site.local');
 ```
 
+### `party.renameHost(oldHostName, newHostName)`
+
+Rename a hostname while keeping its IP binding.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `oldHostName` | `string` | Current hostname |
+| `newHostName` | `string` | New hostname |
+
+```javascript
+await party.renameHost('old-app.local', 'new-app.local');
+```
+
+### `party.moveHostname(hostname, toIP)`
+
+Move a hostname from its current IP to a new IP.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hostname` | `string` | Hostname to move |
+| `toIP` | `string` | Destination IP address |
+
+```javascript
+await party.moveHostname('myapp.local', '192.168.1.100');
+```
+
+### `party.replaceIP(fromIP, toIP, [keepSource])`
+
+Migrate all hostnames from one IP to another.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `fromIP` | `string` | Source IP address |
+| `toIP` | `string` | Destination IP address |
+| `keepSource` | `boolean` | Keep source IP (copy mode). Default: `false` |
+
+```javascript
+// Move all hostnames (removes source IP)
+await party.replaceIP('192.168.1.1', '192.168.1.2');
+
+// Copy all hostnames (keeps source IP)
+await party.replaceIP('192.168.1.1', '192.168.1.2', true);
+```
+
+### `party.searchByIP(ip)`
+
+Find all hostnames mapped to a given IP address.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ip` | `string` | IP address to search for |
+
+Returns `{ ip, hostnames }` or `null` if not found.
+
+```javascript
+const result = await party.searchByIP('127.0.0.1');
+// { ip: '127.0.0.1', hostnames: ['localhost', 'myapp.local'] }
+```
+
+### `party.disable(ips)`
+
+Disable IP entries by commenting them out.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ips` | `string \| string[]` | IP address(es) to disable |
+
+```javascript
+await party.disable('192.168.1.100');
+// Entry becomes: # 192.168.1.100 myapp.local
+```
+
+### `party.enable(ips)`
+
+Re-enable previously disabled IP entries.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `ips` | `string \| string[]` | IP address(es) to enable |
+
+```javascript
+await party.enable('192.168.1.100');
+// Restores: 192.168.1.100 myapp.local
+```
+
+### `party.getStats()`
+
+Get statistics about the hosts file.
+
+```javascript
+const stats = await party.getStats();
+// {
+//   activeIPs: 12,
+//   disabledIPs: 2,
+//   totalIPs: 14,
+//   totalHostnames: 28,
+//   uniqueHostnames: 25
+// }
+```
+
+### `party.createBackup()`
+
+Create a backup of the current hosts file.
+
+```javascript
+const backupPath = await party.createBackup();
+// ~/.hostparty-backups/hosts.backup.2024-01-15T10-30-00-000Z
+```
+
+### `party.listBackups()`
+
+List all available backup files.
+
+```javascript
+const backups = await party.listBackups();
+// [{ filename, path, timestamp }, ...]
+```
+
+### `party.restore([backupPath])`
+
+Restore the hosts file from a backup.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `backupPath` | `string` | Path to backup file. Default: latest backup |
+
+```javascript
+// Restore from latest backup
+await party.restore();
+
+// Restore from specific backup
+await party.restore('/path/to/backup');
+```
+
 ### `party.setup(options)`
 
 Configure hostparty. Returns the party instance for chaining.
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `path` | `string` | Custom path to hosts file |
-| `force` | `boolean` | Bypass protection on system entries |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `path` | `string` | auto | Custom path to hosts file |
+| `force` | `boolean` | `false` | Bypass protection on system entries |
+| `dryRun` | `boolean` | `false` | Preview changes without writing |
+| `autoBackup` | `boolean` | `true` | Auto-backup before changes |
+| `maxBackups` | `number` | `10` | Maximum backups to retain |
 
 ```javascript
 party.setup({ path: '/custom/hosts', force: true }).removeIP('::1');
@@ -134,17 +274,32 @@ party.setup({ path: '/custom/hosts', force: true }).removeIP('::1');
 Usage: hostparty [options] [command]
 
 Commands:
-  list [options] [hostname]          Output hosts file, optionally filtered
-  add [options] [ip] [hosts...]      Add hostname(s) to an IP address
-  remove-ip [options] [ips...]       Remove all entries for IP address(es)
-  remove-host [options] [hosts...]   Remove specific hostname(s)
+  list [hostname]                    Output hosts file, optionally filtered
+  add [ip] [hosts...]                Add hostname(s) to an IP address
+  remove-ip [ips...]                 Remove all entries for IP address(es)
+  remove-host [hosts...]             Remove specific hostname(s)
+  rename-host [oldHost] [newHost]    Rename a hostname
+  move-hostname [hostname] [toIP]    Move a hostname to a different IP
+  search-ip [ip]                     Find all hostnames for an IP
+  replace-ip [fromIP] [toIP]         Migrate hostnames between IPs
+  disable [ips...]                   Comment out IP entries
+  enable [ips...]                    Restore commented IP entries
+  stats                              Show hosts file statistics
+  backup                             Create a backup
+  list-backups                       List available backups
+  restore [filename]                 Restore from backup
 
 Options:
-  -p, --path      Path to hosts file (auto-detected by default)
-  -f, --force     Bypass validation on protected entries
-  -ng, --no-group Don't group output by IP
-  -h, --help      Show help
-  -V, --version   Show version
+  --path [path]     Path to hosts file (auto-detected by default)
+  --force           Bypass validation on protected entries
+  --no-group        Don't group output by IP
+  --dry-run         Preview changes without applying
+  --no-backup       Skip automatic backup
+  --json            Output in JSON format (list, stats)
+  --csv             Output in CSV format (list)
+  --keep-source     Keep source IP when using replace-ip
+  -h, --help        Show help
+  -V, --version     Show version
 ```
 
 ### Examples
@@ -159,11 +314,59 @@ hostparty list
 # List entries matching a hostname
 hostparty list myapp
 
+# List in JSON format
+hostparty list --json
+
+# List in CSV format
+hostparty list --csv
+
 # Remove all entries for an IP
 hostparty remove-ip 127.0.0.1
 
 # Remove specific hostnames
 hostparty remove-host old-site.local
+
+# Rename a hostname
+hostparty rename-host old.local new.local
+
+# Move a hostname to a different IP
+hostparty move-hostname myapp.local 192.168.1.100
+
+# Find hostnames for an IP
+hostparty search-ip 127.0.0.1
+
+# Migrate all hostnames from one IP to another
+hostparty replace-ip 192.168.1.1 192.168.1.2
+
+# Copy hostnames (keep source)
+hostparty replace-ip 192.168.1.1 192.168.1.2 --keep-source
+
+# Temporarily disable an IP entry
+hostparty disable 192.168.1.100
+
+# Re-enable a disabled entry
+hostparty enable 192.168.1.100
+
+# Preview changes without applying
+hostparty add 127.0.0.1 test.local --dry-run
+
+# Show statistics
+hostparty stats
+
+# Create a backup
+hostparty backup
+
+# List available backups
+hostparty list-backups
+
+# Restore from latest backup
+hostparty restore
+
+# Restore from specific backup
+hostparty restore hosts.backup.2024-01-15T10-30-00-000Z
+
+# Skip auto-backup for a change
+hostparty add 127.0.0.1 temp.local --no-backup
 ```
 
 ### Smart Argument Detection
@@ -177,6 +380,60 @@ Warning: Arguments might be swapped. Did you mean: 192.168.1.100 example.com?
 Use the suggested order? (y/n): y
 Using corrected order.
 1 hostname(s) added to IP 192.168.1.100
+```
+
+---
+
+## Backup & Restore
+
+Hostparty automatically creates backups before making changes. Backups are stored in `~/.hostparty-backups/`.
+
+```bash
+# Manual backup
+hostparty backup
+
+# List backups
+hostparty list-backups
+# Found 3 backup(s):
+#   hosts.backup.2024-01-15T10-30-00-000Z
+#   hosts.backup.2024-01-14T15-45-00-000Z
+#   hosts.backup.2024-01-13T09-00-00-000Z
+
+# Restore latest
+hostparty restore
+
+# Restore specific backup
+hostparty restore hosts.backup.2024-01-14T15-45-00-000Z
+
+# Skip auto-backup for a single operation
+hostparty remove-host temp.local --no-backup
+```
+
+### Backup Configuration
+
+```javascript
+party.setup({
+  autoBackup: true,   // Enable/disable auto-backup (default: true)
+  maxBackups: 10      // Maximum backups to keep (default: 10)
+});
+```
+
+---
+
+## Dry Run Mode
+
+Preview changes before applying them:
+
+```bash
+$ hostparty add 127.0.0.1 test.local --dry-run
+[DRY RUN] Would add: test.local -> 127.0.0.1
+[DRY RUN] No changes written to disk.
+```
+
+```javascript
+party.setup({ dryRun: true });
+const result = await party.add('127.0.0.1', ['test.local']);
+// { dryRun: true, message: 'Would add: test.local -> 127.0.0.1', preview: '...' }
 ```
 
 ---
@@ -203,7 +460,7 @@ Certain entries are protected from accidental removal as they're critical for OS
 
 ### Overriding Protection
 
-Use the `--force` flag (CLI) or `force: true` option (API) to remove protected entries:
+Use the `--force` flag (CLI) or `force: true` option (API) to modify protected entries:
 
 ```bash
 # CLI
